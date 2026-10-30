@@ -163,6 +163,16 @@ function main() {
     console.log(`${name}: ${png.length} bytes (${size}x${size})`);
   }
 
+  // Linux 图标集：electron-builder 要求按 <尺寸>x<尺寸>.png 命名放在 build/icons 下，
+  // 会据此生成 AppImage / deb / desktop 文件所需的各种尺寸。
+  const ICONS_DIR = path.join(OUT_DIR, 'icons');
+  fs.mkdirSync(ICONS_DIR, { recursive: true });
+  for (const size of [16, 24, 32, 48, 64, 128, 256, 512, 1024]) {
+    const png = encodePNG(renderIcon(size), size);
+    fs.writeFileSync(path.join(ICONS_DIR, `${size}x${size}.png`), png);
+    console.log(`icons/${size}x${size}.png: ${png.length} bytes`);
+  }
+
   // 托盘图标（16x16，半透明深色以便在浅色托盘上也可见）
   const trayPx = renderIcon(16);
   const trayPng = encodePNG(trayPx, 16);

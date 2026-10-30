@@ -1,10 +1,14 @@
 {
   "name": "crazynote-desktop",
   "productName": "CrazyNote",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CrazyNote 桌面客户端 —— 连接飞牛 NAS 上的 CrazyNote 服务端",
   "main": "src/main/main.js",
-  "author": "local",
+  "author": {
+    "name": "crazyboy945",
+    "email": "dawnpro@gmail.com"
+  },
+  "homepage": "https://github.com/crazyboy945/CrazyNote",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -12,6 +16,8 @@
     "dev": "electron . --dev",
     "dist": "electron-builder --win --x64",
     "dist:dir": "electron-builder --win --x64 --dir",
+    "dist:linux": "electron-builder --linux AppImage deb tar.gz --x64",
+    "dist:linux:dir": "electron-builder --linux --x64 --dir",
     "icons": "node scripts/make-icons.js"
   },
   "devDependencies": {
@@ -28,7 +34,9 @@
     },
     "files": [
       "src/**/*",
-      "package.json"
+      "package.json",
+      "build/tray.png",
+      "build/icon.png"
     ],
     "win": {
       "target": [
@@ -43,6 +51,45 @@
       ],
       "icon": "build/icon.ico",
       "artifactName": "CrazyNote-${version}-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        },
+        {
+          "target": "tar.gz",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "build/icons",
+      "category": "Utility",
+      "maintainer": "crazyboy945 <dawnpro@gmail.com>",
+      "synopsis": "CrazyNote 桌面客户端",
+      "description": "连接飞牛 NAS 上的 CrazyNote 服务端，浏览与编辑 Markdown 笔记，支持网页摘录与代码高亮。",
+      "artifactName": "CrazyNote-${version}-linux-${arch}.${ext}",
+      "extraFiles": [
+        {
+          "from": "scripts/install-linux.sh",
+          "to": "install.sh"
+        }
+      ],
+      "desktop": {
+        "entry": {
+          "Name": "CrazyNote",
+          "Comment": "CrazyNote 桌面客户端",
+          "Categories": "Utility;NoteTaking;",
+          "StartupWMClass": "CrazyNote"
+        }
+      }
+    },
+    "deb": {
+      "depends": ["libgtk-3-0", "libnotify4", "libnss3", "libxss1", "libxtst6", "xdg-utils", "libatspi2.0-0"]
     },
     "nsis": {
       "oneClick": false,

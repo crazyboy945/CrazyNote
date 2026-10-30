@@ -275,11 +275,16 @@ POST /api/render
 
 ## 七、桌面客户端
 
-Windows 桌面程序（Electron），连接 NAS 上的 CrazyNote 服务端浏览与编辑笔记。
+Electron 桌面程序，连接 NAS 上的 CrazyNote 服务端浏览与编辑笔记。**Windows 与 Linux 双平台**。
 
 ### 使用
 
-解压 `CrazyNote-1.0.0.zip` 或运行安装包 → 启动后填服务端地址与访问口令 → 连接。
+| 平台 | 产物 | 安装方式 |
+|------|------|----------|
+| Windows | `CrazyNote-1.0.1-x64.exe`（安装包）、`CrazyNote-1.0.1-x64.zip`（免安装） | 双击安装，或解压后直接运行 |
+| Linux | `CrazyNote-1.0.1-linux-x64.AppImage`（单文件）、`CrazyNote-1.0.1-linux-x64.deb`（Debian/Ubuntu）、`CrazyNote-1.0.1-linux-x64.tar.gz`（免安装） | AppImage 加执行权限直接运行；deb 用 `sudo apt install ./xxx.deb` |
+
+启动后填服务端地址与访问口令 → 连接。
 
 | 功能 | 说明 |
 |------|------|
@@ -288,17 +293,30 @@ Windows 桌面程序（Electron），连接 NAS 上的 CrazyNote 服务端浏览
 | 快捷键 | `Ctrl+N` 新建、`Ctrl+S` 保存、`Ctrl+Shift+V` 摘录剪贴板、`Ctrl+,` 设置 |
 | 系统托盘 | 常驻后台，右键菜单可新建笔记、摘录剪贴板、退出 |
 | 剪贴板速记 | `Ctrl+Shift+V` 把剪贴板内容直接存进「摘录」分类 |
-| 凭据安全 | 口令用系统 `safeStorage` 加密存储，不落明文 |
+| 凭据安全 | 口令用系统 `safeStorage` 加密存储；Linux 无系统钥匙环时自动降级为本地编码 |
 | 亮暗适配 | 跟随系统主题，代码高亮同步切换 |
+
+> **Linux 说明**：
+> - 免安装包解压后自带 `install.sh`：执行 `./install.sh` 装到用户目录（`~/.local`）并自动创建应用菜单入口与图标；
+>   `./install.sh --system` 需要 root（可正确设置 `chrome-sandbox` 的 setuid，保留完整沙箱保护）；
+>   `./install.sh --uninstall` 卸载。
+> - 托盘图标在 GNOME 下需要 AppIndicator 扩展支持（Ubuntu 需安装 `gnome-shell-extension-appindicator`）；
+>   KDE / XFCE 等原生支持托盘的桌面环境开箱即用。
+> - 无钥匙环（gnome-keyring / kwallet）时口令以本地编码保存，安全性略降，建议在 NAS 端使用强口令。
+> - 依赖：Debian/Ubuntu 需 `libgtk-3-0`、`libnotify4`、`libnss3` 等运行时库（deb 包已声明依赖）。
+> - AppImage 与 deb 必须在 Linux 宿主上打包（分别依赖 `mksquashfs` 与 Ruby `fpm`），
+>   仓库内置 GitHub Actions 工作流 `.github/workflows/build-desktop.yml`，推送后自动在 `ubuntu-latest` 上构建。
 
 ### 开发
 
 ```bash
 cd desktop
-npm install          # 首次需下载 Electron（约 100MB）
-npm start            # 开发模式
-npm run icons        # 重新生成图标
-npm run dist         # 打包 Windows 安装包与免安装 zip
+npm install            # 首次需下载 Electron（约 100MB）
+npm start              # 开发模式
+npm run icons          # 重新生成图标（含 Linux 多尺寸图标集）
+npm run dist           # 打包 Windows 安装包与免安装 zip
+npm run dist:linux     # 打包 Linux（AppImage + deb + tar.gz）
+npm run dist:linux:dir # 仅解包 Linux 目录，便于调试
 ```
 
 架构：主进程负责所有 HTTP 请求（规避浏览器 CORS 限制）与会话 Cookie 管理，渲染层只通过 `contextBridge` 暴露的受限接口通信。

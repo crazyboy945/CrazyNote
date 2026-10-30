@@ -1,0 +1,99 @@
+name: 构建桌面客户端
+
+# 在桌面端源码变更时自动构建 Linux / Windows 产物。
+# Linux 的 AppImage 与 deb 必须在 Linux 宿主上打包（分别依赖 mksquashfs 与 Ruby fpm），
+# 本地 Windows 机器只能产出 tar.gz，因此放到 CI 里出完整格式。
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'desktop/**'
+      - '.github/workflows/build-desktop.yml'
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    name: Linux (AppImage / deb / tar.gz)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: 安装依赖
+        working-directory: desktop
+        run: npm ci
+
+      - name: 生成图标（含 Linux 多尺寸图标集）
+        working-directory: desktop
+        run: npm run icons
+
+      - name: 打包 Linux
+        working-directory: desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --linux AppImage deb tar.gz --x64
+
+      - name: 上传 Linux 产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: CrazyNote-linux-x64
+          path: |
+            desktop/release/*.AppImage
+            desktop/release/*.deb
+            desktop/release/*.tar.gz
+          if-no-files-found: error
+          retention-days: 30
+
+      # 打 tag（v1.0.1）时发布 Release，产物可公开下载
+      - name: 发布 Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            desktop/release/*.AppImage
+            desktop/release/*.deb
+            desktop/release/*.tar.gz
+          generate_release_notes: true
+
+  build-windows:
+    name: Windows (安装包 / 免安装 zip)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: 安装依赖
+        working-directory: desktop
+        run: npm ci
+
+      - name: 生成图标
+        working-directory: desktop
+        run: npm run icons
+
+      - name: 打包 Windows
+        working-directory: desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --win --x64
+
+      - name: 上传 Windows 产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: CrazyNote-windows-x64
+          path: |
+            desktop/release/*.exe
+            desktop/release/*.zip
+            if-no-files-found: error
+          retention-days: 30
