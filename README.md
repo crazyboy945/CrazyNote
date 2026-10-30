@@ -34,6 +34,9 @@ CrazyNote 把「阅读」和「编辑」放在同一个界面里，**默认阅�
 - **链接不误触**：点击正文里的超链接会正常跳转，不会因此切到编辑态。
 
 > 图片统一存放在笔记根目录下的隐藏目录 `.crazynote/assets/images/`，不会污染分类目录、也不会被当成 `.md` 笔记扫描；文件名会做安全化处理，并拒绝路径穿越。
+>
+> 笔记里记录的图片地址是稳定的 `/assets/images/xxx.png`，**与访问方式无关**（飞牛桌面图标、局域网直连都指向同一个地址），
+> 网关前缀由服务端在渲染时按需补上。这样同一篇笔记换用别的工具打开、或改用局域网直连访问时，图片都不会失效。
 
 ### Markdown 样式
 
@@ -94,7 +97,7 @@ source: https://blog.example.com/go-concurrency
 
 ```bash
 bash scripts/build.sh          # 交叉编译 x86_64 / arm64 / armv7l
-python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.5.fpk
+python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.6.fpk
 ```
 
 > **版本号（重要）**：fnOS 应用中心按 manifest 里的 `version` 判断能否覆盖安装，
@@ -116,7 +119,7 @@ python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.5.fpk
 
 **安装**：
 
-1. 把 `dist/crazynote-1.0.5.fpk` 传到 NAS（可走文件管理或 SMB）
+1. 把 `dist/crazynote-1.0.6.fpk` 传到 NAS（可走文件管理或 SMB）
 2. 飞牛桌面 → 应用中心 → 手动安装 → 选择该 fpk
 3. 向导里填写**笔记存储目录**（例如 `/vol1/1000/Notes`）和局域网端口
 4. 装完后飞牛桌面出现「CrazyNote」图标，点击即用（走统一网关，NAS 账号免登）
@@ -126,7 +129,7 @@ python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.5.fpk
 也可以用命令行安装：
 
 ```bash
-appcenter-cli install-fpk crazynote-1.0.5.fpk
+appcenter-cli install-fpk crazynote-1.0.6.fpk
 ```
 
 ### 方式 B：裸二进制（SSH 直接跑）

@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -657,11 +658,10 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "界面资源缺失", http.StatusInternalServerError)
 		return
 	}
-	// 注入网关前缀，保证前端在网关下用正确的相对路径
-	prefix := ""
-	if s.gatewayPrefix != "" && strings.HasPrefix(r.URL.Path, s.gatewayPrefix) {
-		prefix = s.gatewayPrefix
-	}
+	// 网关模式下，请求路径已被 ServeHTTP 剥离过前缀，这里不能再用
+	// "路径是否以 prefix 开头"来判断（剥离后必然不成立），
+	// 直接使用配置的前缀注入给前端，保证前端请求带前缀能命中网关路由。
+	prefix := s.gatewayPrefix
 	html := strings.ReplaceAll(string(data), "__CRAZYNOTE_BASE__", prefix)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-store")
@@ -761,7 +761,23 @@ func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
 	if src == "" {
 		src = req.Body
 	}
-	writeJSON(w, http.StatusOK, map[string]any{"html": render.Markdown(src)})
+	writeJSON(w, http.StatusOK, map[string]any{"html": s.rewriteAssetURLs(render.Markdown(src))})
+}
+
+// appAssetSrcRe 匹配渲染结果里指向应用内图片目录的绝对路径。
+var appAssetSrcRe = regexp.MustCompile(`src="/assets/images/`)
+
+// rewriteAssetURLs 给渲染结果里的应用内图片地址补上网关前缀。
+//
+// 笔记正文里保存的是稳定的 /assets/images/xxx.png（与访问方式无关，
+// 换局域网直连或用别的工具打开都还是同一个路径）；
+// 但网关模式下浏览器需要 /app/crazynote/assets/images/xxx.png 才能命中网关路由，
+// 所以在渲染时按需补前缀。
+func (s *Server) rewriteAssetURLs(html string) string {
+	if s.gatewayPrefix == "" {
+		return html
+	}
+	return appAssetSrcRe.ReplaceAllString(html, `src="`+s.gatewayPrefix+`/assets/images/`)
 }
 
 // handleHighlightCSS 返回语法高亮主题样式。

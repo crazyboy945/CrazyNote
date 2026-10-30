@@ -405,7 +405,9 @@
         });
       })
       .then(function (d) {
-        var url = (BASE || '') + d.url;
+        // 笔记里保存稳定的应用内绝对路径（与访问方式无关），
+        // 网关前缀由服务端在渲染时补上，避免笔记被访问方式绑定。
+        var url = d.url;
         var alt = (file.name || 'image').replace(/\.[^.]+$/, '');
         insertAtCursor('![' + alt + '](' + url + ')');
         status('图片已插入: ' + alt);

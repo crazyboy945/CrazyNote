@@ -59,13 +59,26 @@ async function updatePreview() {
   const body = $('note-body').value;
   const res = await api.request('POST', '/api/render', { markdown: body });
   if (res.ok && res.data && res.data.html) {
-    $('preview').innerHTML = res.data.html;
+    $('preview').innerHTML = fixAssetUrls(res.data.html);
   } else {
     // 服务端不可用时回退到简单渲染
     $('preview').innerHTML = '<p style="color:var(--text-faint)">预览不可用：' +
       (res.error || '未能连接服务端') + '</p>';
   }
   bindPreviewLinks();
+}
+
+/**
+ * 补全应用内图片的地址。
+ *
+ * 笔记正文里保存的是稳定的 /assets/images/xxx.png，
+ * 但桌面端渲染层跑在 file:// 协议下，直接用会被解析成 file:///assets/...，
+ * 因此要拼上服务端地址。
+ */
+function fixAssetUrls(html) {
+  const base = (state.config && state.config.currentUrl) || '';
+  if (!base) return html;
+  return html.replace(/src="\/(assets\/images\/)/g, 'src="' + base + '/$1');
 }
 
 /** 预览区里的外链交给系统浏览器打开 */
