@@ -42,6 +42,25 @@ jobs:
         # --include=dev：确保 electron / electron-builder 等构建期依赖一定装上
         run: npm ci --include=dev
 
+      - name: 同步桌面端版本号
+        working-directory: desktop
+        run: |
+          # 版本号统一由 tag 推导（v1.0.8 -> 1.0.8），避免产物文件名与 release 不一致
+          VERSION="${GITHUB_REF_NAME#v}"
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            VERSION="$(node -p "require('./package.json').version")"
+          fi
+          node -e "
+          const fs = require('fs');
+          for (const f of ['package.json', 'package-lock.json']) {
+            const j = JSON.parse(fs.readFileSync(f, 'utf8'));
+            j.version = process.argv[1];
+            if (j.packages && j.packages['']) j.packages[''].version = process.argv[1];
+            fs.writeFileSync(f, JSON.stringify(j, null, 2) + '\n');
+          }
+          " "$VERSION"
+          echo "桌面端版本号: $(node -p "require('./package.json').version")"
+
       - name: 生成图标（含 Linux 多尺寸图标集）
         working-directory: desktop
         run: npm run icons
@@ -101,6 +120,25 @@ jobs:
       - name: 安装依赖
         working-directory: desktop
         run: npm ci --include=dev
+
+      - name: 同步桌面端版本号
+        working-directory: desktop
+        run: |
+          # 版本号统一由 tag 推导（v1.0.8 -> 1.0.8），避免产物文件名与 release 不一致
+          VERSION="${GITHUB_REF_NAME#v}"
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            VERSION="$(node -p "require('./package.json').version")"
+          fi
+          node -e "
+          const fs = require('fs');
+          for (const f of ['package.json', 'package-lock.json']) {
+            const j = JSON.parse(fs.readFileSync(f, 'utf8'));
+            j.version = process.argv[1];
+            if (j.packages && j.packages['']) j.packages[''].version = process.argv[1];
+            fs.writeFileSync(f, JSON.stringify(j, null, 2) + '\n');
+          }
+          " "$VERSION"
+          echo "桌面端版本号: $(node -p "require('./package.json').version")"
 
       - name: 生成图标
         working-directory: desktop

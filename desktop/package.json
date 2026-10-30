@@ -1,7 +1,7 @@
 {
   "name": "crazynote-desktop",
   "productName": "CrazyNote",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "CrazyNote 桌面客户端 —— 连接飞牛 NAS 上的 CrazyNote 服务端",
   "main": "src/main/main.js",
   "repository": {
@@ -47,11 +47,15 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "zip",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "build/icon.ico",
@@ -61,15 +65,21 @@
       "target": [
         {
           "target": "AppImage",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "deb",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "tar.gz",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "build/icons",
@@ -94,7 +104,15 @@
       }
     },
     "deb": {
-      "depends": ["libgtk-3-0", "libnotify4", "libnss3", "libxss1", "libxtst6", "xdg-utils", "libatspi2.0-0"]
+      "depends": [
+        "libgtk-3-0",
+        "libnotify4",
+        "libnss3",
+        "libxss1",
+        "libxtst6",
+        "xdg-utils",
+        "libatspi2.0-0"
+      ]
     },
     "nsis": {
       "oneClick": false,
