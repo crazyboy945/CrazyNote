@@ -20,6 +20,7 @@
 | 内容可移植 | 整个笔记目录拷走即可迁移，或直接纳入 Git / Syncthing 同步 |
 | 图片上传与插入 | 编辑器内一键上传本地图片，自动以 `![alt](url)` 插入光标处，图片存于隐藏目录 `.crazynote/assets/images/` |
 | 阅读/编辑一体 | 默认阅读态（渲染富文本、代码块高亮），点击正文即进入编辑（Markdown 源文） |
+| Markdown 样式切换 | 内置简约 / 悦读 / 学术 / 卡片 / 紧凑 5 套阅读样式，设置里一键切换并自动保存 |
 
 ---
 
@@ -33,6 +34,20 @@ CrazyNote 把「阅读」和「编辑」放在同一个界面里，**默认阅�
 - **链接不误触**：点击正文里的超链接会正常跳转，不会因此切到编辑态。
 
 > 图片统一存放在笔记根目录下的隐藏目录 `.crazynote/assets/images/`，不会污染分类目录、也不会被当成 `.md` 笔记扫描；文件名会做安全化处理，并拒绝路径穿越。
+
+### Markdown 样式
+
+内置 5 套阅读样式，在「⚙️ 设置 → Markdown 样式」里**点击即切换**，自动保存到 `<笔记目录>/.crazynote/meta.json`，对所有笔记生效，亮色 / 暗色模式都适配。
+
+| 样式 | 特点 | 适合 |
+|------|------|------|
+| 简约 | 无衬线、适中行距，界面默认风格 | 日常通用 |
+| 悦读 | 衬线字体、宽行距、限宽居中、标题主色 | 长文阅读 |
+| 学术 | 衬线字体、两端对齐、首行缩进 2 字、标题居中 | 论文 / 文档 |
+| 卡片 | 圆角卡片 + 轻阴影、大留白 | 长文、截图说明 |
+| 紧凑 | 小字号、紧行距、压缩段落间距 | 技术笔记、密集信息 |
+
+> 样式只影响**阅读视图**的渲染效果，不改变 `.md` 源文件内容，用其它工具打开时完全不受影响。
 
 ## 三、目录结构
 
@@ -79,7 +94,7 @@ source: https://blog.example.com/go-concurrency
 
 ```bash
 bash scripts/build.sh          # 交叉编译 x86_64 / arm64 / armv7l
-python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.2.fpk
+python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.3.fpk
 ```
 
 > **架构说明**：FPK 包的 `manifest` 里用 `platform` 字段声明架构（`x86` / `arm` / `all`），
@@ -89,7 +104,7 @@ python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.2.fpk
 
 **安装**：
 
-1. 把 `dist/crazynote-1.0.2.fpk` 传到 NAS（可走文件管理或 SMB）
+1. 把 `dist/crazynote-1.0.3.fpk` 传到 NAS（可走文件管理或 SMB）
 2. 飞牛桌面 → 应用中心 → 手动安装 → 选择该 fpk
 3. 向导里填写**笔记存储目录**（例如 `/vol1/1000/Notes`）和局域网端口
 4. 装完后飞牛桌面出现「CrazyNote」图标，点击即用（走统一网关，NAS 账号免登）
@@ -99,7 +114,7 @@ python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.2.fpk
 也可以用命令行安装：
 
 ```bash
-appcenter-cli install-fpk crazynote-1.0.2.fpk
+appcenter-cli install-fpk crazynote-1.0.3.fpk
 ```
 
 ### 方式 B：裸二进制（SSH 直接跑）
