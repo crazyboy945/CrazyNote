@@ -1,7 +1,7 @@
 {
   "name": "crazynote-desktop",
   "productName": "CrazyNote",
-  "version": "1.0.1",
+  "version": "1.0.6",
   "description": "CrazyNote 桌面客户端 —— 连接飞牛 NAS 上的 CrazyNote 服务端",
   "main": "src/main/main.js",
   "author": {
@@ -21,13 +21,14 @@
     "icons": "node scripts/make-icons.js"
   },
   "devDependencies": {
-    "electron": "^33.2.0",
+    "electron": "33.4.11",
     "electron-builder": "^25.1.8"
   },
   "build": {
     "appId": "com.crazynote.desktop",
     "productName": "CrazyNote",
     "copyright": "Copyright © 2026 CrazyNote",
+    "electronVersion": "33.4.11",
     "directories": {
       "output": "release",
       "buildResources": "build"

@@ -13,6 +13,11 @@ on:
       - 'v*'
   workflow_dispatch:
 
+# 需要 issues: write 才能在构建失败时把日志写成 issue（便于排查）
+permissions:
+  contents: write
+  issues: write
+
 jobs:
   build-linux:
     name: Linux (AppImage / deb / tar.gz)
@@ -22,13 +27,15 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: desktop/package-lock.json
 
       - name: 安装依赖
         working-directory: desktop
-        run: npm ci
+        # --include=dev：确保 electron / electron-builder 等构建期依赖一定装上，
+        # 否则 electron-builder 解析不出 Electron 版本会直接失败
+        run: npm ci --include=dev
 
       - name: 生成图标（含 Linux 多尺寸图标集）
         working-directory: desktop
@@ -41,15 +48,24 @@ jobs:
           ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
         run: |
           set +e
-          npx electron-builder --linux AppImage deb tar.gz --x64 > build-linux.log 2>&1
+          npx --no-install electron-builder --linux AppImage deb tar.gz --x64 > build-linux.log 2>&1
           rc=$?
-          # 把日志尾部写进 job summary，这样无需 admin 权限也能看到失败原因
+          # 日志尾部写进 job summary；失败时再写成 issue（无需 admin 权限即可读取）
           {
             echo "### 构建日志（退出码 $rc）"
             echo '```'
             tail -80 build-linux.log
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$rc" != "0" ]; then
+            {
+              echo "自动采集的 CI 构建失败日志（run #${{ github.run_number }}）"
+              echo '```'
+              tail -80 build-linux.log
+              echo '```'
+            } > build-failure.md
+            gh issue create --title "CI 构建失败 #${{ github.run_number }}" --body-file build-failure.md || true
+          fi
           cat build-linux.log
           exit $rc
 
@@ -64,7 +80,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      # 打 tag（v1.0.1）时发布 Release，产物可公开下载
+      # 打 tag（v1.0.6）时发布 Release，产物可公开下载
       - name: 发布 Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
@@ -83,13 +99,13 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: desktop/package-lock.json
 
       - name: 安装依赖
         working-directory: desktop
-        run: npm ci
+        run: npm ci --include=dev
 
       - name: 生成图标
         working-directory: desktop
@@ -100,9 +116,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
+        shell: bash
         run: |
           set +e
-          npx electron-builder --win --x64 > build-win.log 2>&1
+          npx --no-install electron-builder --win --x64 > build-win.log 2>&1
           rc=$?
           {
             echo "### 构建日志（退出码 $rc）"
@@ -110,6 +127,15 @@ jobs:
             tail -80 build-win.log
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$rc" != "0" ]; then
+            {
+              echo "自动采集的 CI 构建失败日志（run #${{ github.run_number }}）"
+              echo '```'
+              tail -80 build-win.log
+              echo '```'
+            } > build-failure.md
+            gh issue create --title "CI 构建失败 #${{ github.run_number }}" --body-file build-failure.md || true
+          fi
           cat build-win.log
           exit $rc
 
@@ -120,5 +146,5 @@ jobs:
           path: |
             desktop/release/*.exe
             desktop/release/*.zip
-            if-no-files-found: error
+          if-no-files-found: error
           retention-days: 30
