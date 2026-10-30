@@ -53,8 +53,17 @@ func New(root string) (*Store, error) {
 		return nil, fmt.Errorf("创建笔记目录失败: %w", err)
 	}
 	s := &Store{root: abs}
-	if err := os.MkdirAll(s.metaPath(), 0o755); err != nil {
-		return nil, err
+	// 只创建 .crazynote 目录本身：meta.json 是文件，不能拿它当目录建。
+	// （早期版本误用 MkdirAll(metaPath())，会把 meta.json 建成目录；
+	//  之后保存元数据时又被改写成文件，于是每次启动都报 "not a directory" 而起不来。）
+	if err := os.MkdirAll(s.metaDir(), 0o755); err != nil {
+		return nil, fmt.Errorf("创建元数据目录失败: %w", err)
+	}
+	// 自愈：清理早期版本误建成的 meta.json 目录，让应用能正常启动
+	if fi, err := os.Stat(s.metaPath()); err == nil && fi.IsDir() {
+		if err := os.RemoveAll(s.metaPath()); err != nil {
+			return nil, fmt.Errorf("清理异常的 meta.json 目录失败: %w", err)
+		}
 	}
 	return s, nil
 }
@@ -62,7 +71,9 @@ func New(root string) (*Store, error) {
 // Root 返回笔记根目录绝对路径。
 func (s *Store) Root() string { return s.root }
 
-func (s *Store) metaPath() string { return filepath.Join(s.root, metaDirName, metaFileName) }
+func (s *Store) metaDir() string { return filepath.Join(s.root, metaDirName) }
+
+func (s *Store) metaPath() string { return filepath.Join(s.metaDir(), metaFileName) }
 
 func (s *Store) trashPath() string { return filepath.Join(s.root, metaDirName, trashDirName) }
 

@@ -1,5 +1,5 @@
 appname=crazynote
-version=1.0.3
+version=1.0.5
 display_name=CrazyNote
 desc=CrazyNote 笔记应用：笔记以 .md 文件存储在 NAS 硬盘上，每个分类对应一个子目录，支持网页摘录。
 platform=x86
@@ -17,4 +17,4 @@ desktop_uidir=ui
 desktop_applaunchname=crazynote.main
 disable_authorization_path=false
 install_type=root
-changelog=新增图片上传并插入笔记；阅读与编辑界面合并（默认阅读，点击正文进入编辑）；内置 5 套 Markdown 样式（简约/悦读/学术/卡片/紧凑）可一键切换。
+changelog=修复启动失败：误将 meta.json 当目录创建，导致二次启动报 not a directory；现已修正并自动清理异常状态。另含图片上传、阅读/编辑一体、5 套 Markdown 样式。

@@ -94,7 +94,7 @@ source: https://blog.example.com/go-concurrency
 
 ```bash
 bash scripts/build.sh          # 交叉编译 x86_64 / arm64 / armv7l
-python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.4.fpk
+python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.5.fpk
 ```
 
 > **版本号（重要）**：fnOS 应用中心按 manifest 里的 `version` 判断能否覆盖安装，
@@ -116,7 +116,7 @@ python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.4.fpk
 
 **安装**：
 
-1. 把 `dist/crazynote-1.0.4.fpk` 传到 NAS（可走文件管理或 SMB）
+1. 把 `dist/crazynote-1.0.5.fpk` 传到 NAS（可走文件管理或 SMB）
 2. 飞牛桌面 → 应用中心 → 手动安装 → 选择该 fpk
 3. 向导里填写**笔记存储目录**（例如 `/vol1/1000/Notes`）和局域网端口
 4. 装完后飞牛桌面出现「CrazyNote」图标，点击即用（走统一网关，NAS 账号免登）
@@ -126,7 +126,7 @@ python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.4.fpk
 也可以用命令行安装：
 
 ```bash
-appcenter-cli install-fpk crazynote-1.0.4.fpk
+appcenter-cli install-fpk crazynote-1.0.5.fpk
 ```
 
 ### 方式 B：裸二进制（SSH 直接跑）
@@ -411,3 +411,16 @@ A：文件名会自动做安全化处理（去掉 `/ \ : * ? < > |` 等非法字
 
 **Q：删除的分类能恢复吗？**
 A：能。被删的分类会移到 `<笔记目录>/.crazynote/trash/` 下，带时间戳，手动移回即可。
+
+**Q：启动报错 `mkdir .../.crazynote/meta.json: not a directory`？**
+A：这是 v1.0.4 及更早版本的缺陷（早期把 `meta.json` 误建成目录，之后保存设置时又被改写为文件，于是二次启动就失败）。
+**v1.0.5 已修复**，升级后即可正常启动；若暂时无法升级，可手动删掉它再重启：
+
+```bash
+rm -rf /usr/local/apps/@appdata/crazynote/notes/.crazynote/meta.json
+```
+
+> `.crazynote/` 目录本身要保留（存分类排序、样式偏好等元数据）；删掉只丢设置，不影响笔记正文。
+
+**Q：Linux 桌面版托盘没有图标？**
+A：GNOME 需安装 `gnome-shell-extension-appindicator`；此外若托盘创建失败，应用会直接退出，可改用 `--no-sandbox` 手动启动查看报错。
