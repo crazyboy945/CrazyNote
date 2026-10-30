@@ -1,7 +1,7 @@
 {
   "name": "crazynote-desktop",
   "productName": "CrazyNote",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "CrazyNote 桌面客户端 —— 连接飞牛 NAS 上的 CrazyNote 服务端",
   "main": "src/main/main.js",
   "repository": {
