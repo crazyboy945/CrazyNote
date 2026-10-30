@@ -1,11 +1,94 @@
 #!/bin/bash
-# upgrade_callback：升级后回调。确保运行时目录存在，保留用户数据（PKGVAR）与配置（PKGETC）。
+# upgrade_callback：升级后回调。
+#
+# 关键点：**必须重启服务**。
+# 升级只是替换了磁盘上的文件，若不重启，旧进程会继续持有端口并提供旧版本的界面，
+# 表现为「安装成功但功能没变」（新加的设置项、按钮都看不到）。
 set -u
 
 APP_NAME="crazynote"
+APPDEST="${TRIM_APPDEST:-/var/apps/${APP_NAME}/target}"
+PKGETC="${TRIM_PKGETC:-/var/apps/${APP_NAME}/etc}"
+PKGVAR="${TRIM_PKGVAR:-/var/apps/${APP_NAME}/var}"
 
-mkdir -p "${TRIM_PKGETC:-/var/apps/${APP_NAME}/etc}" \
-         "${TRIM_PKGVAR:-/var/apps/${APP_NAME}/var}" \
-         "${TRIM_APPDEST:-/var/apps/${APP_NAME}/target}/bin" 2>/dev/null || true
+PID_FILE="${PKGVAR}/crazynote.pid"
+LOG_FILE="${PKGVAR}/crazynote.log"
+
+log() {
+  echo "$(date '+%Y-%m-%d %H:%M:%S') [$1] $2" >> "${LOG_FILE}" 2>/dev/null || true
+  if [ -n "${TRIM_TEMP_LOGFILE:-}" ]; then
+    echo "$2" >> "${TRIM_TEMP_LOGFILE}" 2>/dev/null || true
+  fi
+}
+
+# 确保运行时目录存在，并保留用户数据（PKGVAR）与配置（PKGETC）
+mkdir -p "${PKGETC}" "${PKGVAR}" "${APPDEST}/bin" 2>/dev/null || true
+
+# 优先复用生命周期主脚本完成重启
+MAIN=""
+for cand in "${APPDEST}/../cmd/main" "${APPDEST}/cmd/main" \
+            "${TRIM_APPCONFIG:-}/cmd/main" "/var/apps/${APP_NAME}/cmd/main"; do
+  if [ -n "${cand}" ] && [ -x "${cand}" ]; then
+    MAIN="$cand"
+    break
+  fi
+done
+
+if [ -n "${MAIN}" ]; then
+  log info "升级后重启服务: ${MAIN}"
+  "${MAIN}" stop  >/dev/null 2>&1 || true
+  sleep 1
+  "${MAIN}" start >/dev/null 2>&1 || true
+  exit 0
+fi
+
+# 兜底：自行完成「停旧起新」
+log info "未找到 cmd/main，就地重启服务"
+
+if [ -f "${PID_FILE}" ]; then
+  OLD_PID="$(cat "${PID_FILE}")"
+  kill "${OLD_PID}" 2>/dev/null || true
+  sleep 1
+  kill -9 "${OLD_PID}" 2>/dev/null || true
+  rm -f "${PID_FILE}"
+fi
+
+BIN=""
+for arch in x86_64 aarch64 armv7l; do
+  if [ -x "${APPDEST}/bin/crazynote-linux-${arch}" ]; then
+    BIN="${APPDEST}/bin/crazynote-linux-${arch}"
+    break
+  fi
+done
+if [ -z "${BIN}" ] && [ -x "${APPDEST}/bin/crazynote" ]; then
+  BIN="${APPDEST}/bin/crazynote"
+fi
+
+if [ -z "${BIN}" ]; then
+  log error "升级后找不到可执行文件，请检查安装包"
+  exit 0
+fi
+
+PORT="$(cat "${PKGETC}/port" 2>/dev/null || true)"
+[ -z "${PORT}" ] && PORT="8899"
+NOTES_DIR="$(cat "${PKGETC}/data-dir" 2>/dev/null || true)"
+[ -z "${NOTES_DIR}" ] && NOTES_DIR="${PKGVAR}/notes"
+mkdir -p "${NOTES_DIR}" 2>/dev/null || true
+
+nohup "${BIN}" \
+  -data "${NOTES_DIR}" \
+  -appdata "${PKGETC}" \
+  -addr "0.0.0.0:${PORT}" \
+  -socket "${APPDEST}/crazynote.sock" \
+  -prefix "/app/${APP_NAME}" \
+  >> "${LOG_FILE}" 2>&1 &
+
+echo $! > "${PID_FILE}"
+sleep 2
+if kill -0 "$(cat "${PID_FILE}")" 2>/dev/null; then
+  log info "升级后已重启服务, PID=$(cat "${PID_FILE}")，端口 ${PORT}"
+else
+  log error "升级后重启失败，请查看 ${LOG_FILE}"
+fi
 
 exit 0

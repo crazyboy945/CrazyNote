@@ -99,6 +99,8 @@
       $('set-title').value = s.title || '';
       $('set-root').value = s.root || '';
       $('set-version').textContent = '版本 ' + (s.version || '未知');
+      // 顶栏常驻版本号，不用进设置就能确认当前运行的是哪一版
+      $('app-version').textContent = s.version ? 'v' + s.version : '';
       applyMarkdownTheme(s.markdown_theme || 'default');
       buildBookmarklet(s.root);
     });

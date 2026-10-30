@@ -49,6 +49,11 @@ html, body {
 }
 .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; white-space: nowrap; }
 .logo { font-size: 18px; }
+.version-tag {
+  font-size: 10.5px; color: var(--muted); background: var(--code-bg);
+  padding: 1px 6px; border-radius: 20px; margin-left: 2px;
+  font-variant-numeric: tabular-nums; user-select: none;
+}
 .search-box { flex: 1; max-width: 520px; }
 .search-box input {
   width: 100%; padding: 7px 12px; border: 1px solid var(--border);

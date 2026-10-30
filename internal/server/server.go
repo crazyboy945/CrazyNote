@@ -671,6 +671,8 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	// 直接使用配置的前缀注入给前端，保证前端请求带前缀能命中网关路由。
 	prefix := s.gatewayPrefix
 	html := strings.ReplaceAll(string(data), "__CRAZYNOTE_BASE__", prefix)
+	// 资源地址带上版本号：升级后浏览器与中间代理不会继续用旧缓存
+	html = strings.ReplaceAll(html, "__CRAZYNOTE_VERSION__", AppVersion)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-store")
 	_, _ = w.Write([]byte(html))

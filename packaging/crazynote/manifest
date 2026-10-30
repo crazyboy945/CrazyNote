@@ -1,5 +1,5 @@
 appname=crazynote
-version=1.0.8
+version=1.0.9
 display_name=CrazyNote
 desc=CrazyNote 笔记应用：笔记以 .md 文件存储在 NAS 硬盘上，每个分类对应一个子目录，支持网页摘录。
 platform=x86
@@ -17,4 +17,4 @@ desktop_uidir=ui
 desktop_applaunchname=crazynote.main
 disable_authorization_path=false
 install_type=root
-changelog=备份与恢复入口上移到设置弹窗顶部并新增版本号显示，便于确认当前安装版本。
+changelog=升级后自动重启服务（此前升级不重启会导致界面仍是旧版）；静态资源加版本号参数避免浏览器沿用旧缓存；顶栏新增常驻版本号。

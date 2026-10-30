@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CrazyNote</title>
-<link rel="icon" type="image/png" href="__CRAZYNOTE_BASE__/assets/favicon.png">
-<link rel="stylesheet" href="__CRAZYNOTE_BASE__/assets/app.css">
-<link rel="stylesheet" href="__CRAZYNOTE_BASE__/assets/highlight-light.css" id="highlight-css">
+<link rel="icon" type="image/png" href="__CRAZYNOTE_BASE__/assets/favicon.png?v=__CRAZYNOTE_VERSION__">
+<link rel="stylesheet" href="__CRAZYNOTE_BASE__/assets/app.css?v=__CRAZYNOTE_VERSION__">
+<link rel="stylesheet" href="__CRAZYNOTE_BASE__/assets/highlight-light.css?v=__CRAZYNOTE_VERSION__" id="highlight-css">
 <script>
   // 暗色模式下切换到暗色高亮主题
   (function () {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      document.getElementById('highlight-css').href = '__CRAZYNOTE_BASE__/assets/highlight-dark.css';
+      document.getElementById('highlight-css').href = '__CRAZYNOTE_BASE__/assets/highlight-dark.css?v=__CRAZYNOTE_VERSION__';
     }
   })();
 </script>
@@ -22,6 +22,7 @@
     <div class="brand">
       <span class="logo">📝</span>
       <span id="app-title">CrazyNote</span>
+      <span class="version-tag" id="app-version" title="当前版本"></span>
     </div>
     <div class="search-box">
       <input type="search" id="search" placeholder="搜索标题、正文、标签…" autocomplete="off">
@@ -191,6 +192,6 @@
 <div class="toast" id="toast" hidden></div>
 
 <script>window.CRAZYNOTE_BASE = "__CRAZYNOTE_BASE__";</script>
-<script src="__CRAZYNOTE_BASE__/assets/app.js"></script>
+<script src="__CRAZYNOTE_BASE__/assets/app.js?v=__CRAZYNOTE_VERSION__"></script>
 </body>
 </html>
