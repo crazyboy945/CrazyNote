@@ -200,19 +200,22 @@ jobs:
 
       - name: 生成发布说明
         run: |
+          # 版本号不带 v 前缀（与实际资源名一致）
+          VERSION="${GITHUB_REF_NAME#v}"
           cat > release-notes.md <<EOF
-          ## CrazyNote ${{ github.ref_name }}
+          ## CrazyNote ${VERSION}
 
           ### fnOS（飞牛 NAS）应用包
-          - \`crazynote-${{ github.ref_name }}.fpk\` —— 应用中心「手动安装」
+          - \`crazynote-${VERSION}.fpk\` —— 应用中心「手动安装」
 
           ### 桌面客户端
-          - \`CrazyNote-${{ github.ref_name }}-linux-x64.AppImage\` —— Linux 单文件版
-          - \`crazynote-${{ github.ref_name }}-linux-amd64.deb\` —— Debian / Ubuntu
-          - \`CrazyNote-${{ github.ref_name }}-linux-x64.tar.gz\` —— Linux 免安装版（自带 install.sh）
-          - \`CrazyNote-${{ github.ref_name }}-x64.exe\` —— Windows 安装包
-          - \`CrazyNote-${{ github.ref_name }}-x64.zip\` —— Windows 免安装版
+          - \`CrazyNote-${VERSION}-linux-x86_64.AppImage\` —— Linux 单文件版
+          - \`CrazyNote-${VERSION}-linux-amd64.deb\` —— Debian / Ubuntu
+          - \`CrazyNote-${VERSION}-linux-x64.tar.gz\` —— Linux 免安装版（自带 install.sh）
+          - \`CrazyNote-${VERSION}-x64.exe\` —— Windows 安装包
+          - \`CrazyNote-${VERSION}-x64.zip\` —— Windows 免安装版
           EOF
+          cat release-notes.md
 
       - name: 发布 Release
         uses: softprops/action-gh-release@v2
