@@ -1,0 +1,23 @@
+# 构建产物（二进制、安装包）
+/dist/
+crazynote.fpk
+CrazyNote.exe
+fnote.exe
+crazynote
+crazynote-linux-*
+crazynote-darwin-*
+crazynote-windows-*
+
+# 桌面端（Electron）构建与依赖
+/desktop/node_modules/
+/desktop/dist/
+/desktop/out/
+/desktop/.vite/
+
+# 运行时数据
+notes/
+*.log
+
+# 系统文件
+.DS_Store
+Thumbs.db
