@@ -1,15 +1,21 @@
 # 构建产物（二进制、安装包）
+# 注意：这些模式必须以 / 开头锚定到仓库根目录，
+# 否则像 crazynote 这样的模式会连带匹配 packaging/crazynote/ 整个源码目录。
 /dist/
-crazynote.fpk
-CrazyNote.exe
-fnote.exe
-crazynote
-crazynote-linux-*
-crazynote-darwin-*
-crazynote-windows-*
+/crazynote.fpk
+/CrazyNote.exe
+/fnote.exe
+/crazynote
+/crazynote-linux-*
+/crazynote-darwin-*
+/crazynote-windows-*
+
+# 打包时暂存的二进制（由 build_fpk.py 从 dist/ 拷入）
+/packaging/crazynote/app/bin/
 
 # 桌面端（Electron）构建与依赖
 /desktop/node_modules/
+/desktop/release/
 /desktop/dist/
 /desktop/out/
 /desktop/.vite/

@@ -1,0 +1,55 @@
+{
+  "name": "crazynote-desktop",
+  "productName": "CrazyNote",
+  "version": "1.0.0",
+  "description": "CrazyNote 桌面客户端 —— 连接飞牛 NAS 上的 CrazyNote 服务端",
+  "main": "src/main/main.js",
+  "author": "local",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "dist": "electron-builder --win --x64",
+    "dist:dir": "electron-builder --win --x64 --dir",
+    "icons": "node scripts/make-icons.js"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.crazynote.desktop",
+    "productName": "CrazyNote",
+    "copyright": "Copyright © 2026 CrazyNote",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "CrazyNote-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "CrazyNote"
+    }
+  }
+}

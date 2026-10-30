@@ -1,0 +1,10 @@
+#!/bin/bash
+# uninstall_callback：卸载后钩子。仅清理运行时态 PID 文件，保留用户笔记数据（PKGVAR）。
+set -u
+
+APP_NAME="crazynote"
+PKGVAR="${TRIM_PKGVAR:-/var/apps/${APP_NAME}/var}"
+
+rm -f "${PKGVAR}/crazynote.pid" 2>/dev/null || true
+
+exit 0

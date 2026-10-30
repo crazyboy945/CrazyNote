@@ -1,0 +1,17 @@
+#!/bin/bash
+# uninstall_init：卸载前钩子。先停止运行中的服务进程，避免残留。
+set -u
+
+APP_NAME="crazynote"
+PKGVAR="${TRIM_PKGVAR:-/var/apps/${APP_NAME}/var}"
+PID_FILE="${PKGVAR}/crazynote.pid"
+
+if [ -f "${PID_FILE}" ]; then
+  pid="$(cat "${PID_FILE}" 2>/dev/null || true)"
+  if [ -n "${pid}" ] && [ -d "/proc/${pid}" ]; then
+    kill "${pid}" 2>/dev/null || true
+  fi
+  rm -f "${PID_FILE}"
+fi
+
+exit 0

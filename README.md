@@ -94,8 +94,20 @@ source: https://blog.example.com/go-concurrency
 
 ```bash
 bash scripts/build.sh          # 交叉编译 x86_64 / arm64 / armv7l
-python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.3.fpk
+python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.4.fpk
 ```
+
+> **版本号（重要）**：fnOS 应用中心按 manifest 里的 `version` 判断能否覆盖安装，
+> **版本号不更新会被判成「已安装更高版本」而拒绝安装**。
+> 打包时用 `VERSION` 环境变量统一指定，脚本会自动把它写进 manifest 与二进制：
+>
+> ```bash
+> VERSION=1.0.4 bash scripts/build.sh
+> VERSION=1.0.4 python scripts/build_fpk.py
+> ```
+>
+> 还可用 `CHANGELOG="本次更新说明"` 覆盖 manifest 的 `changelog`（升级时展示给用户）。
+> `manifest` 里的 `version` 只是兜底值，每次打包都会被 `VERSION` 覆盖。
 
 > **架构说明**：FPK 包的 `manifest` 里用 `platform` 字段声明架构（`x86` / `arm` / `all`），
 > 打包脚本会按该字段**只打包对应架构的二进制**。默认是 `x86`。
@@ -104,7 +116,7 @@ python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.3.fpk
 
 **安装**：
 
-1. 把 `dist/crazynote-1.0.3.fpk` 传到 NAS（可走文件管理或 SMB）
+1. 把 `dist/crazynote-1.0.4.fpk` 传到 NAS（可走文件管理或 SMB）
 2. 飞牛桌面 → 应用中心 → 手动安装 → 选择该 fpk
 3. 向导里填写**笔记存储目录**（例如 `/vol1/1000/Notes`）和局域网端口
 4. 装完后飞牛桌面出现「CrazyNote」图标，点击即用（走统一网关，NAS 账号免登）
@@ -114,7 +126,7 @@ python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.3.fpk
 也可以用命令行安装：
 
 ```bash
-appcenter-cli install-fpk crazynote-1.0.3.fpk
+appcenter-cli install-fpk crazynote-1.0.4.fpk
 ```
 
 ### 方式 B：裸二进制（SSH 直接跑）

@@ -1,0 +1,13 @@
+#!/bin/bash
+# install_init：安装前初始化（源码/二进制已随包就位，无需下载或编译）。
+# fnOS 1.2.x 生命周期脚本之一，缺任何一个都会拒绝安装。
+set -u
+
+APP_NAME="crazynote"
+
+# 确保运行时目录存在，供后续 install_callback / main 写入配置与数据。
+mkdir -p "${TRIM_PKGETC:-/var/apps/${APP_NAME}/etc}" \
+         "${TRIM_PKGVAR:-/var/apps/${APP_NAME}/var}" \
+         "${TRIM_APPDEST:-/var/apps/${APP_NAME}/target}/bin" 2>/dev/null || true
+
+exit 0

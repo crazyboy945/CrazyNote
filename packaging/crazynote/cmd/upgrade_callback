@@ -1,0 +1,11 @@
+#!/bin/bash
+# upgrade_callback：升级后回调。确保运行时目录存在，保留用户数据（PKGVAR）与配置（PKGETC）。
+set -u
+
+APP_NAME="crazynote"
+
+mkdir -p "${TRIM_PKGETC:-/var/apps/${APP_NAME}/etc}" \
+         "${TRIM_PKGVAR:-/var/apps/${APP_NAME}/var}" \
+         "${TRIM_APPDEST:-/var/apps/${APP_NAME}/target}/bin" 2>/dev/null || true
+
+exit 0

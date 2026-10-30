@@ -1,0 +1,5 @@
+#!/bin/bash
+# upgrade_init：升级前钩子。二进制随包刷新，无需预处理，直接放行。
+set -u
+
+exit 0

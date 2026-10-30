@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    width: 340px; margin: 0; padding: 14px;
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-size: 13px; color: #1f2328; background: #fff;
+  }
+  h1 { font-size: 14px; margin: 0 0 12px; display: flex; align-items: center; gap: 6px; }
+  .field { margin-bottom: 11px; }
+  label { display: block; font-size: 11px; color: #6b7280; margin-bottom: 4px; font-weight: 600; }
+  input[type=text], input[type=password], select, textarea {
+    width: 100%; padding: 6px 9px; border: 1px solid #d8dade;
+    border-radius: 6px; font-size: 12.5px; font-family: inherit; background: #fff; color: #1f2328;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: #2f6feb; }
+  textarea { resize: vertical; min-height: 58px; font-size: 12px; }
+  button {
+    width: 100%; padding: 8px; border: 1px solid #2f6feb; border-radius: 6px;
+    background: #2f6feb; color: #fff; font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  button:hover { background: #2558c4; }
+  button.secondary { background: #fff; color: #1f2328; border-color: #d8dade; margin-top: 6px; }
+  button.secondary:hover { background: #f3f4f6; }
+  button:disabled { opacity: .55; cursor: not-allowed; }
+  .row { display: flex; gap: 6px; }
+  .row input { flex: 1; }
+  .row button { width: auto; padding: 6px 12px; }
+  .status { margin-top: 10px; padding: 8px 10px; border-radius: 6px; font-size: 12px; display: none; }
+  .status.ok { display: block; background: #e7f5ec; color: #137333; }
+  .status.err { display: block; background: #fdecea; color: #c5221f; }
+  .status.info { display: block; background: #eef3fd; color: #1a4fb4; }
+  .preview { font-size: 11.5px; color: #6b7280; margin: 6px 0 0; max-height: 78px; overflow: hidden; }
+  .meta { display: flex; gap: 6px; align-items: center; margin-bottom: 10px; }
+  .meta a { color: #6b7280; font-size: 11px; cursor: pointer; text-decoration: underline; }
+  .divider { height: 1px; background: #eceef0; margin: 12px 0; }
+  .hint { font-size: 11px; color: #8b9199; margin: -6px 0 10px; line-height: 1.5; }
+</style>
+</head>
+<body>
+  <h1>📝 摘录到 CrazyNote</h1>
+
+  <div class="field" id="setup-box" hidden>
+    <label>CrazyNote 服务地址</label>
+    <input type="text" id="server" placeholder="http://192.168.1.10:8899">
+    <label style="margin-top:8px">摘录令牌（在笔记应用「设置」中生成）</label>
+    <input type="password" id="token" placeholder="访问令牌">
+    <div class="row" style="margin-top:10px">
+      <button class="secondary" id="btn-save-setup" style="margin:0">保存设置</button>
+    </div>
+  </div>
+
+  <div id="main-box">
+    <div class="field">
+      <label>保存到分类</label>
+      <select id="category"></select>
+      <div class="meta">
+        <a id="link-new-cat">+ 新建分类</a>
+        <a id="link-refresh">刷新分类</a>
+        <a id="link-setup">设置</a>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>标题</label>
+      <input type="text" id="title" placeholder="自动读取页面标题">
+    </div>
+
+    <div class="field">
+      <label>标签（逗号分隔，可选）</label>
+      <input type="text" id="tags" placeholder="例如：技术,参考">
+    </div>
+
+    <div class="field">
+      <label>正文预览</label>
+      <textarea id="preview" readonly placeholder="正在提取页面正文…"></textarea>
+      <p class="preview" id="stats"></p>
+    </div>
+
+    <div class="field">
+      <label><input type="checkbox" id="use-selection"> 只保存选中内容</label>
+    </div>
+
+    <button id="btn-save">保存到 NAS</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

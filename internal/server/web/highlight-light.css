@@ -1,0 +1,73 @@
+/* Background */ .cnbg { background-color: #f7f7f7; }
+/* PreWrapper */ .cnchroma { background-color: #f7f7f7; -webkit-text-size-adjust: none; }
+/* Error */ .cnchroma .cnerr { color: #f6f8fa; background-color: #82071e }
+/* LineLink */ .cnchroma .cnlnlinks { outline: none; text-decoration: none; color: inherit }
+/* LineTableTD */ .cnchroma .cnlntd { vertical-align: top; padding: 0; margin: 0; border: 0; }
+/* LineTable */ .cnchroma .cnlntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }
+/* LineHighlight */ .cnchroma .cnhl { background-color: #dedede }
+/* LineNumbersTable */ .cnchroma .cnlnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
+/* LineNumbers */ .cnchroma .cnln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
+/* Line */ .cnchroma .cnline { display: flex; }
+/* Keyword */ .cnchroma .cnk { color: #cf222e }
+/* KeywordConstant */ .cnchroma .cnkc { color: #cf222e }
+/* KeywordDeclaration */ .cnchroma .cnkd { color: #cf222e }
+/* KeywordNamespace */ .cnchroma .cnkn { color: #cf222e }
+/* KeywordPseudo */ .cnchroma .cnkp { color: #cf222e }
+/* KeywordReserved */ .cnchroma .cnkr { color: #cf222e }
+/* KeywordType */ .cnchroma .cnkt { color: #cf222e }
+/* NameAttribute */ .cnchroma .cnna { color: #1f2328 }
+/* NameClass */ .cnchroma .cnnc { color: #1f2328 }
+/* NameConstant */ .cnchroma .cnno { color: #0550ae }
+/* NameDecorator */ .cnchroma .cnnd { color: #0550ae }
+/* NameEntity */ .cnchroma .cnni { color: #6639ba }
+/* NameLabel */ .cnchroma .cnnl { color: #990000; font-weight: bold }
+/* NameNamespace */ .cnchroma .cnnn { color: #24292e }
+/* NameOther */ .cnchroma .cnnx { color: #1f2328 }
+/* NameTag */ .cnchroma .cnnt { color: #0550ae }
+/* NameBuiltin */ .cnchroma .cnnb { color: #6639ba }
+/* NameBuiltinPseudo */ .cnchroma .cnbp { color: #6a737d }
+/* NameVariable */ .cnchroma .cnnv { color: #953800 }
+/* NameVariableClass */ .cnchroma .cnvc { color: #953800 }
+/* NameVariableGlobal */ .cnchroma .cnvg { color: #953800 }
+/* NameVariableInstance */ .cnchroma .cnvi { color: #953800 }
+/* NameVariableMagic */ .cnchroma .cnvm { color: #953800 }
+/* NameFunction */ .cnchroma .cnnf { color: #6639ba }
+/* NameFunctionMagic */ .cnchroma .cnfm { color: #6639ba }
+/* LiteralString */ .cnchroma .cns { color: #0a3069 }
+/* LiteralStringAffix */ .cnchroma .cnsa { color: #0a3069 }
+/* LiteralStringBacktick */ .cnchroma .cnsb { color: #0a3069 }
+/* LiteralStringChar */ .cnchroma .cnsc { color: #0a3069 }
+/* LiteralStringDelimiter */ .cnchroma .cndl { color: #0a3069 }
+/* LiteralStringDoc */ .cnchroma .cnsd { color: #0a3069 }
+/* LiteralStringDouble */ .cnchroma .cns2 { color: #0a3069 }
+/* LiteralStringEscape */ .cnchroma .cnse { color: #0a3069 }
+/* LiteralStringHeredoc */ .cnchroma .cnsh { color: #0a3069 }
+/* LiteralStringInterpol */ .cnchroma .cnsi { color: #0a3069 }
+/* LiteralStringOther */ .cnchroma .cnsx { color: #0a3069 }
+/* LiteralStringRegex */ .cnchroma .cnsr { color: #0a3069 }
+/* LiteralStringSingle */ .cnchroma .cns1 { color: #0a3069 }
+/* LiteralStringSymbol */ .cnchroma .cnss { color: #032f62 }
+/* LiteralNumber */ .cnchroma .cnm { color: #0550ae }
+/* LiteralNumberBin */ .cnchroma .cnmb { color: #0550ae }
+/* LiteralNumberFloat */ .cnchroma .cnmf { color: #0550ae }
+/* LiteralNumberHex */ .cnchroma .cnmh { color: #0550ae }
+/* LiteralNumberInteger */ .cnchroma .cnmi { color: #0550ae }
+/* LiteralNumberIntegerLong */ .cnchroma .cnil { color: #0550ae }
+/* LiteralNumberOct */ .cnchroma .cnmo { color: #0550ae }
+/* Operator */ .cnchroma .cno { color: #0550ae }
+/* OperatorWord */ .cnchroma .cnow { color: #0550ae }
+/* OperatorReserved */ .cnchroma .cnor { color: #0550ae }
+/* Punctuation */ .cnchroma .cnp { color: #1f2328 }
+/* Comment */ .cnchroma .cnc { color: #57606a }
+/* CommentHashbang */ .cnchroma .cnch { color: #57606a }
+/* CommentMultiline */ .cnchroma .cncm { color: #57606a }
+/* CommentSingle */ .cnchroma .cnc1 { color: #57606a }
+/* CommentSpecial */ .cnchroma .cncs { color: #57606a }
+/* CommentPreproc */ .cnchroma .cncp { color: #57606a }
+/* CommentPreprocFile */ .cnchroma .cncpf { color: #57606a }
+/* GenericDeleted */ .cnchroma .cngd { color: #82071e; background-color: #ffebe9 }
+/* GenericEmph */ .cnchroma .cnge { color: #1f2328 }
+/* GenericInserted */ .cnchroma .cngi { color: #116329; background-color: #dafbe1 }
+/* GenericOutput */ .cnchroma .cngo { color: #1f2328 }
+/* GenericUnderline */ .cnchroma .cngl { text-decoration: underline }
+/* TextWhitespace */ .cnchroma .cnw { color: #ffffff }

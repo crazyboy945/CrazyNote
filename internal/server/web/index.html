@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CrazyNote</title>
+<link rel="icon" type="image/png" href="__CRAZYNOTE_BASE__/assets/favicon.png">
+<link rel="stylesheet" href="__CRAZYNOTE_BASE__/assets/app.css">
+<link rel="stylesheet" href="__CRAZYNOTE_BASE__/assets/highlight-light.css" id="highlight-css">
+<script>
+  // 暗色模式下切换到暗色高亮主题
+  (function () {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.getElementById('highlight-css').href = '__CRAZYNOTE_BASE__/assets/highlight-dark.css';
+    }
+  })();
+</script>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">📝</span>
+      <span id="app-title">CrazyNote</span>
+    </div>
+    <div class="search-box">
+      <input type="search" id="search" placeholder="搜索标题、正文、标签…" autocomplete="off">
+    </div>
+    <div class="topbar-actions">
+      <span class="user-badge" id="user-badge"></span>
+      <button class="btn ghost" id="btn-settings" title="设置">⚙️</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- 分类栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-head">
+          <span>分类</span>
+          <button class="btn tiny" id="btn-new-category" title="新建分类">＋</button>
+        </div>
+        <ul class="category-list" id="category-list"></ul>
+      </div>
+      <div class="sidebar-section grow">
+        <div class="sidebar-head">
+          <span>标签</span>
+        </div>
+        <div class="tag-cloud" id="tag-cloud"></div>
+      </div>
+    </aside>
+
+    <!-- 笔记列表 -->
+    <section class="list-pane">
+      <div class="list-head">
+        <span id="list-title">全部笔记</span>
+        <button class="btn primary tiny" id="btn-new-note" title="新建笔记">＋ 新建</button>
+      </div>
+      <ul class="note-list" id="note-list"></ul>
+      <div class="list-empty" id="list-empty" hidden>暂无笔记</div>
+    </section>
+
+    <!-- 编辑区 -->
+    <section class="editor-pane" id="editor-pane">
+      <div class="editor-toolbar">
+        <input type="text" id="note-title" class="title-input" placeholder="笔记标题">
+        <input type="text" id="note-tags" class="tags-input" placeholder="标签，逗号分隔">
+        <div class="toolbar-right">
+          <button class="btn ghost" id="btn-preview" title="切换到编辑（默认阅读模式）">✏️ 编辑</button>
+          <button class="btn ghost" id="btn-upload" title="上传图片并插入到笔记">🖼️ 图片</button>
+          <button class="btn ghost" id="btn-move" title="移动到其他分类">📁</button>
+          <button class="btn danger ghost" id="btn-delete" title="删除笔记">🗑</button>
+          <button class="btn primary" id="btn-save" title="保存 (Ctrl+S)">保存</button>
+          <input type="file" id="file-image" accept="image/*" hidden>
+        </div>
+      </div>
+      <div class="editor-body">
+        <textarea id="note-body" class="body-input" placeholder="用 Markdown 书写正文…" spellcheck="false"></textarea>
+        <article class="preview markdown-body" id="preview">
+          <div class="preview-inner" id="preview-inner"></div>
+        </article>
+      </div>
+      <div class="status-bar" id="status-bar"></div>
+    </section>
+  </div>
+</div>
+
+<!-- 登录遮罩 -->
+<div class="overlay" id="login-overlay" hidden>
+  <div class="dialog">
+    <h2>登录</h2>
+    <p class="muted" id="login-hint">请输入访问口令</p>
+    <input type="password" id="login-password" placeholder="访问口令" autocomplete="current-password">
+    <div class="dialog-actions">
+      <button class="btn ghost" id="btn-login-cancel">取消</button>
+      <button class="btn primary" id="btn-login">登录</button>
+    </div>
+  </div>
+</div>
+
+<!-- 设置弹窗 -->
+<div class="overlay" id="settings-overlay" hidden>
+  <div class="dialog wide">
+    <h2>设置</h2>
+    <div class="form-row">
+      <label>应用名称</label>
+      <input type="text" id="set-title" placeholder="CrazyNote">
+    </div>
+    <div class="form-row">
+      <label>笔记根目录</label>
+      <input type="text" id="set-root" readonly class="readonly">
+      <p class="hint">每个分类是根目录下的一个子目录，笔记为纯 Markdown 文件。</p>
+    </div>
+    <div class="form-row">
+      <label>网页摘录令牌</label>
+      <div class="inline">
+        <input type="text" id="set-token" placeholder="点击右侧按钮生成" readonly class="readonly">
+        <button class="btn" id="btn-gen-token">生成</button>
+        <button class="btn" id="btn-copy-token">复制</button>
+      </div>
+      <p class="hint">在浏览器扩展或书签脚本中填写此令牌，即可一键摘录网页。</p>
+    </div>
+    <div class="form-row">
+      <label>Markdown 样式</label>
+      <div class="theme-picker" id="theme-picker">
+        <button type="button" class="theme-card active" data-theme="default">
+          <span class="theme-name">简约</span>
+          <span class="theme-desc">系统默认无衬线，通用排版</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="reading">
+          <span class="theme-name">悦读</span>
+          <span class="theme-desc">衬线字体、宽行距，适合长文</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="paper">
+          <span class="theme-name">学术</span>
+          <span class="theme-desc">两端对齐 + 首行缩进，像论文</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="card">
+          <span class="theme-name">卡片</span>
+          <span class="theme-desc">圆角卡片 + 轻阴影，留白舒适</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="compact">
+          <span class="theme-name">紧凑</span>
+          <span class="theme-desc">小字号紧行距，一屏看更多</span>
+        </button>
+      </div>
+      <p class="hint">作用于阅读视图，点击即生效并自动保存。</p>
+    </div>
+    <div class="form-row">
+      <label>访问口令</label>
+      <div class="inline">
+        <input type="password" id="set-password" placeholder="留空表示不修改">
+        <button class="btn" id="btn-change-password">修改</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <label>书签脚本</label>
+      <textarea id="set-bookmarklet" readonly rows="3"></textarea>
+      <p class="hint">拖到浏览器书签栏即可使用；点击后把当前页面正文存进「摘录」分类。</p>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn ghost" id="btn-settings-close">关闭</button>
+      <button class="btn primary" id="btn-save-settings">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 输入弹窗 -->
+<div class="overlay" id="prompt-overlay" hidden>
+  <div class="dialog">
+    <h2 id="prompt-title">输入</h2>
+    <p class="muted" id="prompt-desc"></p>
+    <input type="text" id="prompt-input">
+    <div class="dialog-actions">
+      <button class="btn ghost" id="btn-prompt-cancel">取消</button>
+      <button class="btn primary" id="btn-prompt-ok">确定</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>window.CRAZYNOTE_BASE = "__CRAZYNOTE_BASE__";</script>
+<script src="__CRAZYNOTE_BASE__/assets/app.js"></script>
+</body>
+</html>

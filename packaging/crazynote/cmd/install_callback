@@ -1,0 +1,17 @@
+#!/bin/bash
+# install_callback：把向导收集的参数写入应用配置目录
+set -u
+
+PKGETC="${TRIM_PKGETC:-/var/apps/crazynote/etc}"
+mkdir -p "${PKGETC}" 2>/dev/null || true
+
+if [ -n "${wizard_note_dir:-}" ]; then
+  echo "${wizard_note_dir}" > "${PKGETC}/data-dir"
+  mkdir -p "${wizard_note_dir}" 2>/dev/null || true
+fi
+
+if [ -n "${wizard_port:-}" ]; then
+  echo "${wizard_port}" > "${PKGETC}/port"
+fi
+
+exit 0

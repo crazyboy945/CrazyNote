@@ -1,0 +1,5 @@
+#!/bin/bash
+# config_init：配置修改前钩子。本应用无需预处理，直接放行。
+set -u
+
+exit 0

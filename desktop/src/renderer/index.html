@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'">
+<title>CrazyNote</title>
+<link rel="stylesheet" href="renderer.css">
+</head>
+<body>
+
+<!-- ============ 连接页 ============ -->
+<div id="connect-screen" class="screen">
+  <div class="connect-card">
+    <div class="brand">
+      <img src="../../build/icon.png" alt="" class="brand-logo">
+      <h1>CrazyNote</h1>
+      <p class="brand-sub">连接飞牛 NAS 上的 CrazyNote 服务端</p>
+    </div>
+
+    <label class="field">
+      <span>服务器地址</span>
+      <input type="text" id="server-url" placeholder="http://192.168.1.10:8899" autocomplete="url" spellcheck="false">
+      <small>局域网直连填 <code>http://IP:8899</code>；桌面图标方式填 <code>https://你的NAS域名/app/crazynote</code></small>
+    </label>
+
+    <label class="field">
+      <span>访问口令</span>
+      <input type="password" id="server-password" placeholder="首次启动服务端日志中的初始口令" autocomplete="current-password">
+      <small>若服务端走 fnOS 网关免登，可留空直接连接</small>
+    </label>
+
+    <div class="connect-actions">
+      <button id="btn-connect" class="primary">连接</button>
+      <button id="btn-test" class="ghost">测试连接</button>
+    </div>
+
+    <div id="connect-status" class="status"></div>
+
+    <div class="connect-foot">
+      <span>桌面端不会保存明文口令，使用系统凭据加密</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 主界面 ============ -->
+<div id="main-screen" class="screen" hidden>
+
+  <!-- 标题栏 -->
+  <header class="titlebar">
+    <div class="tb-left">
+      <button class="icon-btn" id="btn-sidebar" title="侧栏">
+        <svg viewBox="0 0 16 16" width="16" height="16"><path d="M2 3h12v10H2z M6 3v10" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+      </button>
+      <span class="tb-title">CrazyNote</span>
+      <span class="tb-server" id="tb-server"></span>
+    </div>
+    <div class="tb-center">
+      <div class="search-box">
+        <svg viewBox="0 0 16 16" width="14" height="14" class="search-icon"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <input type="text" id="search" placeholder="搜索笔记标题、正文、标签…" spellcheck="false">
+        <kbd>Ctrl+F</kbd>
+      </div>
+    </div>
+    <div class="tb-right">
+      <button class="icon-btn" id="btn-clip" title="摘录剪贴板 (Ctrl+Shift+V)">
+        <svg viewBox="0 0 16 16" width="16" height="16"><path d="M6 2h4v2H6z M4 4h8v10H4z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+      </button>
+      <button class="icon-btn primary" id="btn-new" title="新建笔记 (Ctrl+N)">
+        <svg viewBox="0 0 16 16" width="16" height="16"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-settings" title="设置">
+        <svg viewBox="0 0 16 16" width="16" height="16"><circle cx="8" cy="8" r="2.4" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M12.6 3.4l-1.1 1.1M4.5 11.5l-1.1 1.1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="body">
+    <!-- 侧栏 -->
+    <aside class="sidebar" id="sidebar">
+      <section class="side-block">
+        <div class="side-head">
+          <span>分类</span>
+          <button class="mini-btn" id="btn-new-cat" title="新建分类">＋</button>
+        </div>
+        <ul class="cat-list" id="cat-list"></ul>
+      </section>
+
+      <section class="side-block tags-block">
+        <div class="side-head"><span>标签</span></div>
+        <div class="tag-cloud" id="tag-cloud"></div>
+      </section>
+
+      <div class="side-foot">
+        <span id="conn-state" class="conn-state"></span>
+        <button class="mini-btn danger" id="btn-disconnect" title="断开连接">断开</button>
+      </div>
+    </aside>
+
+    <!-- 笔记列表 -->
+    <section class="list-pane">
+      <div class="list-head">
+        <span id="list-title">全部笔记</span>
+        <span class="list-count" id="list-count"></span>
+      </div>
+      <div class="note-list" id="note-list"></div>
+    </section>
+
+    <!-- 编辑区 -->
+    <section class="editor-pane" id="editor-pane">
+      <div class="empty-state" id="empty-state">
+        <img src="../../build/icon.png" alt="" class="empty-logo">
+        <p>选择左侧笔记开始阅读</p>
+        <p class="empty-hint">或按 <kbd>Ctrl</kbd>+<kbd>N</kbd> 新建一篇</p>
+      </div>
+
+      <div class="editor" id="editor" hidden>
+        <div class="editor-bar">
+          <input type="text" id="note-title" class="title-input" placeholder="笔记标题" spellcheck="false">
+          <input type="text" id="note-tags" class="tags-input" placeholder="标签，逗号分隔" spellcheck="false">
+          <div class="editor-actions">
+            <select id="note-category" class="cat-select" title="移动到分类"></select>
+            <button class="ghost-btn" id="btn-delete" title="删除笔记">删除</button>
+            <button class="ghost-btn" id="btn-preview" title="预览">预览</button>
+            <button class="primary-btn" id="btn-save" title="保存 (Ctrl+S)">保存</button>
+          </div>
+        </div>
+        <div class="editor-meta" id="editor-meta"></div>
+        <textarea id="note-body" class="body-input" placeholder="用 Markdown 书写…" spellcheck="false"></textarea>
+        <div id="preview" class="preview markdown-body" hidden></div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="statusbar">
+    <span id="status-text">就绪</span>
+    <span class="status-right">
+      <span id="save-state"></span>
+      <span id="item-count"></span>
+    </span>
+  </footer>
+</div>
+
+<!-- ============ 设置弹窗 ============ -->
+<div class="overlay" id="settings-overlay" hidden>
+  <div class="dialog">
+    <h2>设置</h2>
+    <label class="field">
+      <span>服务器地址</span>
+      <input type="text" id="set-url" spellcheck="false">
+    </label>
+    <label class="field">
+      <span>访问口令</span>
+      <input type="password" id="set-password" placeholder="留空表示不修改" autocomplete="off">
+    </label>
+    <label class="field">
+      <span>默认摘录分类</span>
+      <input type="text" id="set-default-cat" placeholder="摘录">
+    </label>
+    <div class="dialog-actions">
+      <button class="ghost-btn" id="btn-settings-close">关闭</button>
+      <button class="primary-btn" id="btn-settings-save">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 分类弹窗 ============ -->
+<div class="overlay" id="prompt-overlay" hidden>
+  <div class="dialog">
+    <h2 id="prompt-title">新建分类</h2>
+    <label class="field">
+      <span id="prompt-label">名称</span>
+      <input type="text" id="prompt-input" spellcheck="false">
+    </label>
+    <div class="dialog-actions">
+      <button class="ghost-btn" id="btn-prompt-cancel">取消</button>
+      <button class="primary-btn" id="btn-prompt-ok">确定</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="renderer.js"></script>
+</body>
+</html>

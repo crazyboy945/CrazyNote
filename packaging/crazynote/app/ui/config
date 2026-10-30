@@ -1,0 +1,18 @@
+{
+  ".url": {
+    "crazynote.main": {
+      "title": "CrazyNote",
+      "icon": "images/icon_{0}.png",
+      "type": "iframe",
+    "protocol": "http",
+    "port": "8899",
+    "url": "/app/crazynote",
+      "allUsers": true,
+      "gatewaySocket": "crazynote.sock",
+      "gatewayPrefix": "/app/crazynote",
+      "control": {
+        "accessPerm": "editable"
+      }
+    }
+  }
+}
