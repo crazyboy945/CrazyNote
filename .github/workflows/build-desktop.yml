@@ -48,7 +48,8 @@ jobs:
           ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
         run: |
           set +e
-          npx --no-install electron-builder --linux AppImage deb tar.gz --x64 > build-linux.log 2>&1
+          # --publish never：不要让 electron-builder 自己尝试发布（CI 里由 workflow 统一发 Release）
+          npx --no-install electron-builder --linux AppImage deb tar.gz --x64 --publish never > build-linux.log 2>&1
           rc=$?
           # 日志尾部写进 job summary；失败时再写成 issue（无需 admin 权限即可读取）
           {
@@ -119,7 +120,8 @@ jobs:
         shell: bash
         run: |
           set +e
-          npx --no-install electron-builder --win --x64 > build-win.log 2>&1
+          # --publish never：不要让 electron-builder 自己尝试发布（CI 里由 workflow 统一发 Release）
+          npx --no-install electron-builder --win --x64 --publish never > build-win.log 2>&1
           rc=$?
           {
             echo "### 构建日志（退出码 $rc）"

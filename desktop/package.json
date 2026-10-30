@@ -4,6 +4,10 @@
   "version": "1.0.6",
   "description": "CrazyNote 桌面客户端 —— 连接飞牛 NAS 上的 CrazyNote 服务端",
   "main": "src/main/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/crazyboy945/CrazyNote.git"
+  },
   "author": {
     "name": "crazyboy945",
     "email": "dawnpro@gmail.com"
@@ -14,9 +18,9 @@
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
-    "dist": "electron-builder --win --x64",
+    "dist": "electron-builder --win --x64 --publish never",
     "dist:dir": "electron-builder --win --x64 --dir",
-    "dist:linux": "electron-builder --linux AppImage deb tar.gz --x64",
+    "dist:linux": "electron-builder --linux AppImage deb tar.gz --x64 --publish never",
     "dist:linux:dir": "electron-builder --linux --x64 --dir",
     "icons": "node scripts/make-icons.js"
   },
