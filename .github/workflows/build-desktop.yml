@@ -123,6 +123,8 @@ jobs:
 
       - name: 同步桌面端版本号
         working-directory: desktop
+        # windows runner 的默认 shell 不是 bash，这里显式指定，否则 shell 语法会失败
+        shell: bash
         run: |
           # 版本号统一由 tag 推导（v1.0.8 -> 1.0.8），避免产物文件名与 release 不一致
           VERSION="${GITHUB_REF_NAME#v}"
