@@ -98,7 +98,7 @@ source: https://blog.example.com/go-concurrency
 
 ```bash
 bash scripts/build.sh          # 交叉编译 x86_64 / arm64 / armv7l
-python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.7.fpk
+python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.8.fpk
 ```
 
 > **版本号（重要）**：fnOS 应用中心按 manifest 里的 `version` 判断能否覆盖安装，
@@ -120,7 +120,7 @@ python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.7.fpk
 
 **安装**：
 
-1. 把 `dist/crazynote-1.0.7.fpk` 传到 NAS（可走文件管理或 SMB）
+1. 把 `dist/crazynote-1.0.8.fpk` 传到 NAS（可走文件管理或 SMB）
 2. 飞牛桌面 → 应用中心 → 手动安装 → 选择该 fpk
 3. 向导里填写**笔记存储目录**（例如 `/vol1/1000/Notes`）和局域网端口
 4. 装完后飞牛桌面出现「CrazyNote」图标，点击即用（走统一网关，NAS 账号免登）
@@ -130,7 +130,7 @@ python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.7.fpk
 也可以用命令行安装：
 
 ```bash
-appcenter-cli install-fpk crazynote-1.0.7.fpk
+appcenter-cli install-fpk crazynote-1.0.8.fpk
 ```
 
 ### 方式 B：裸二进制（SSH 直接跑）
@@ -443,6 +443,9 @@ rm -rf /usr/local/apps/@appdata/crazynote/notes/.crazynote/meta.json
 ```
 
 > `.crazynote/` 目录本身要保留（存分类排序、样式偏好等元数据）；删掉只丢设置，不影响笔记正文。
+
+**Q：怎么确认 NAS 上装的是哪个版本？**
+A：打开「⚙️ 设置」，标题下方会直接显示当前版本号（如「版本 1.0.8」）。命令行执行 `crazynote -version` 也能看到。
 
 **Q：Linux 桌面版托盘没有图标？**
 A：GNOME 需安装 `gnome-shell-extension-appindicator`；此外若托盘创建失败，应用会直接退出，可改用 `--no-sandbox` 手动启动查看报错。

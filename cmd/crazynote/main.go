@@ -32,6 +32,9 @@ func main() {
 		return
 	}
 
+	// 把版本号交给 server 包，界面设置弹窗里会显示当前版本
+	server.AppVersion = version
+
 	// 后台模式：重新以脱离方式启动自身，然后当前进程退出
 	if *daemon {
 		if err := detach(); err != nil {

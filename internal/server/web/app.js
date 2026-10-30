@@ -98,6 +98,7 @@
       }
       $('set-title').value = s.title || '';
       $('set-root').value = s.root || '';
+      $('set-version').textContent = '版本 ' + (s.version || '未知');
       applyMarkdownTheme(s.markdown_theme || 'default');
       buildBookmarklet(s.root);
     });

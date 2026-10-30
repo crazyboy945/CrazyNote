@@ -548,6 +548,9 @@ func (s *Server) handleClipPreview(w http.ResponseWriter, r *http.Request) {
 
 // ---------- 设置与令牌 ----------
 
+// AppVersion 应用版本号，由 main 包在启动时注入（便于界面显示当前版本）。
+var AppVersion = "dev"
+
 // markdownThemes 支持的 Markdown 样式主题。
 // 前端与此处保持一致；非法值一律忽略（保留当前设置），避免旧版本客户端写入脏数据。
 var markdownThemes = map[string]bool{
@@ -569,6 +572,7 @@ func (s *Server) handleGetSettings(w http.ResponseWriter, r *http.Request) {
 		"auth":           s.auth.Describe(),
 		"category_order": meta.CategoryOrder,
 		"markdown_theme": meta.MarkdownTheme,
+		"version":        AppVersion,
 	})
 }
 
