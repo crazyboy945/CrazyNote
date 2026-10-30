@@ -147,6 +147,15 @@
       <p class="hint">作用于阅读视图，点击即生效并自动保存。</p>
     </div>
     <div class="form-row">
+      <label>备份与恢复</label>
+      <div class="inline">
+        <button class="btn" id="btn-backup" title="导出全部笔记为 ZIP">导出备份</button>
+        <button class="btn" id="btn-restore" title="从备份 ZIP 恢复">恢复备份</button>
+        <input type="file" id="file-backup" accept=".zip,application/zip" hidden>
+      </div>
+      <p class="hint">导出为 ZIP，含全部分类、笔记、样式设置与图片。恢复会先自动快照现有笔记再覆盖，万一出问题可从笔记目录下的 <code>.crazynote/restore-backups/</code> 找回。</p>
+    </div>
+    <div class="form-row">
       <label>访问口令</label>
       <div class="inline">
         <input type="password" id="set-password" placeholder="留空表示不修改">

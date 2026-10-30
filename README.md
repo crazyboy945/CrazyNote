@@ -21,6 +21,7 @@
 | 图片上传与插入 | 编辑器内一键上传本地图片，自动以 `![alt](url)` 插入光标处，图片存于隐藏目录 `.crazynote/assets/images/` |
 | 阅读/编辑一体 | 默认阅读态（渲染富文本、代码块高亮），点击正文即进入编辑（Markdown 源文） |
 | Markdown 样式切换 | 内置简约 / 悦读 / 学术 / 卡片 / 紧凑 5 套阅读样式，设置里一键切换并自动保存 |
+| 备份与恢复 | 设置里一键导出全量备份 ZIP（分类 / 笔记 / 图片 / 设置），恢复前自动快照，出错可回退 |
 
 ---
 
@@ -97,7 +98,7 @@ source: https://blog.example.com/go-concurrency
 
 ```bash
 bash scripts/build.sh          # 交叉编译 x86_64 / arm64 / armv7l
-python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.6.fpk
+python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.7.fpk
 ```
 
 > **版本号（重要）**：fnOS 应用中心按 manifest 里的 `version` 判断能否覆盖安装，
@@ -119,7 +120,7 @@ python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.6.fpk
 
 **安装**：
 
-1. 把 `dist/crazynote-1.0.6.fpk` 传到 NAS（可走文件管理或 SMB）
+1. 把 `dist/crazynote-1.0.7.fpk` 传到 NAS（可走文件管理或 SMB）
 2. 飞牛桌面 → 应用中心 → 手动安装 → 选择该 fpk
 3. 向导里填写**笔记存储目录**（例如 `/vol1/1000/Notes`）和局域网端口
 4. 装完后飞牛桌面出现「CrazyNote」图标，点击即用（走统一网关，NAS 账号免登）
@@ -129,7 +130,7 @@ python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.6.fpk
 也可以用命令行安装：
 
 ```bash
-appcenter-cli install-fpk crazynote-1.0.6.fpk
+appcenter-cli install-fpk crazynote-1.0.7.fpk
 ```
 
 ### 方式 B：裸二进制（SSH 直接跑）
@@ -341,6 +342,24 @@ npm run dist:linux:dir # 仅解包 Linux 目录，便于调试
 ---
 
 ## 九、备份与迁移
+
+### 应用内备份与恢复
+
+「⚙️ 设置 → 备份与恢复」提供两个按钮：
+
+| 操作 | 说明 |
+|------|------|
+| **导出备份** | 把整个笔记目录打包成 ZIP 下载，含**全部分类、笔记、样式设置与上传的图片** |
+| **恢复备份** | 选择备份 ZIP 覆盖恢复；恢复前系统会**自动把现有内容快照**到 `<笔记目录>/.crazynote/restore-backups/<时间戳>/` |
+
+恢复是破坏性操作，因此：
+
+- 必须先在弹窗里确认，服务端还要求请求带确认标记，避免误触；
+- 压缩包会先做**完整校验**（拒绝 `..` 路径穿越、绝对路径、超大文件与 zip 炸弹），**校验不通过直接拒绝、绝不改动现有数据**；
+- 校验通过后先快照再解压，出问题可以从 `.crazynote/restore-backups/` 手工找回；
+- 历史快照目录**不会**被打进下一次备份，避免备份文件无限膨胀。
+
+### 手工备份
 
 - **备份**：复制整个笔记目录即可（含 `.crazynote/`）。目录里没有数据库文件，不需要停服。
 - **迁移**：把目录拷到另一台 NAS 或本地，改 `-data` 指向它。

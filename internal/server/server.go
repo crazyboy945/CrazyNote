@@ -83,6 +83,10 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("POST /api/upload", s.handleUpload)
 	s.mux.HandleFunc("GET /assets/images/{file}", s.handleImage)
 
+	// 备份与恢复
+	s.mux.HandleFunc("GET /api/backup", s.handleBackup)
+	s.mux.HandleFunc("POST /api/restore", s.handleRestore)
+
 	// 网页摘录接口（扩展与书签脚本调用）
 	s.mux.HandleFunc("POST /api/clip", s.handleClip)
 	s.mux.HandleFunc("POST /api/clip/preview", s.handleClipPreview)
@@ -864,6 +868,90 @@ func detectImageContentType(name string, data []byte) string {
 		return "image/svg+xml"
 	}
 	return http.DetectContentType(data)
+}
+
+// ---------- 备份与恢复 ----------
+
+// handleBackup 导出整个笔记目录为 ZIP，供用户下载保存。
+func (s *Server) handleBackup(w http.ResponseWriter, r *http.Request) {
+	if _, ok := s.requireAuth(w, r); !ok {
+		return
+	}
+	// 先打包到临时文件：既能在出错时干净地返回错误，也能给出准确的文件大小
+	tmp, err := os.CreateTemp("", "crazynote-backup-*.zip")
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]any{"error": "创建临时文件失败: " + err.Error()})
+		return
+	}
+	defer os.Remove(tmp.Name())
+	defer tmp.Close()
+
+	stats, err := s.store.ExportBackup(tmp)
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]any{"error": "打包失败: " + err.Error()})
+		return
+	}
+	fi, err := tmp.Stat()
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+		return
+	}
+	name := fmt.Sprintf("crazynote-backup-%s.zip", time.Now().Format("20060102-150405"))
+	w.Header().Set("Content-Type", "application/zip")
+	w.Header().Set("Content-Length", strconv.FormatInt(fi.Size(), 10))
+	w.Header().Set("Content-Disposition", `attachment; filename="`+name+`"`)
+	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Set("X-CrazyNote-Backup-Files", strconv.Itoa(stats.Files))
+	w.Header().Set("X-CrazyNote-Backup-Notes", strconv.Itoa(stats.Notes))
+	http.ServeContent(w, r, name, fi.ModTime(), tmp)
+	log.Printf("导出备份完成: %s（%d 个文件 / %d 篇笔记 / %d 张图片）", name, stats.Files, stats.Notes, stats.Images)
+}
+
+// handleRestore 从上传的 ZIP 恢复笔记。
+//
+// 这是破坏性操作（会覆盖现有笔记），因此要求请求带上确认标记，
+// 并在恢复前自动为现有内容创建快照。
+func (s *Server) handleRestore(w http.ResponseWriter, r *http.Request) {
+	if _, ok := s.requireAuth(w, r); !ok {
+		return
+	}
+	if r.Header.Get("X-CrazyNote-Confirm") != "restore" {
+		writeJSON(w, http.StatusBadRequest, map[string]any{"error": "缺少恢复确认标记"})
+		return
+	}
+	if err := r.ParseMultipartForm(64 << 20); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]any{"error": "备份文件过大或格式不正确"})
+		return
+	}
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]any{"error": "未找到备份文件"})
+		return
+	}
+	defer file.Close()
+
+	tmp, err := os.CreateTemp("", "crazynote-restore-*.zip")
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]any{"error": "创建临时文件失败: " + err.Error()})
+		return
+	}
+	defer os.Remove(tmp.Name())
+	defer tmp.Close()
+	if _, err := io.Copy(tmp, file); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]any{"error": "读取备份文件失败: " + err.Error()})
+		return
+	}
+
+	stats, err := s.store.RestoreBackup(tmp.Name())
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]any{"error": err.Error()})
+		return
+	}
+	log.Printf("恢复完成: %s（%d 个文件 / %d 篇笔记），快照: %s", header.Filename, stats.Files, stats.Notes, stats.Snapshot)
+	writeJSON(w, http.StatusOK, map[string]any{
+		"ok":    true,
+		"stats": stats,
+	})
 }
 
 var _ = errors.New

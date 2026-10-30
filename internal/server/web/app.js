@@ -444,6 +444,71 @@
     }
   }
 
+  // ---------- 备份与恢复 ----------
+  // 导出：把整个笔记目录打包成 ZIP 下载（走 fetch 以带上会话 Cookie）。
+  function exportBackup() {
+    status('正在打包备份…');
+    fetch(BASE + '/api/backup', { credentials: 'same-origin' })
+      .then(function (res) {
+        if (!res.ok) {
+          return res.text().then(function (t) {
+            var d = {};
+            try { d = JSON.parse(t); } catch (e) { d = { error: t }; }
+            throw new Error(d.error || ('导出失败 ' + res.status));
+          });
+        }
+        return res.blob();
+      })
+      .then(function (blob) {
+        var d = new Date();
+        var name = 'crazynote-backup-' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) +
+          '-' + pad(d.getHours()) + pad(d.getMinutes()) + '.zip';
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+        status('备份已导出: ' + name);
+        toast('备份已导出');
+      })
+      .catch(function (e) { status(''); toast(e.message); });
+  }
+
+  // 恢复：用备份内容覆盖当前笔记（服务端会先自动快照现有内容）。
+  function restoreBackup(file) {
+    confirmPrompt('恢复备份',
+      '恢复会用备份文件覆盖当前全部笔记。系统会先自动快照现有内容，出问题可从笔记目录下的 .crazynote/restore-backups/ 找回。确定继续？',
+      function () {
+        var fd = new FormData();
+        fd.append('file', file);
+        status('正在恢复…');
+        fetch(BASE + '/api/restore', {
+          method: 'POST',
+          body: fd,
+          credentials: 'same-origin',
+          headers: { 'X-CrazyNote-Confirm': 'restore' }
+        })
+          .then(function (res) {
+            return res.text().then(function (t) {
+              var d = {};
+              try { d = JSON.parse(t); } catch (e) { d = { error: t }; }
+              if (!res.ok) throw new Error(d.error || ('恢复失败 ' + res.status));
+              return d;
+            });
+          })
+          .then(function (d) {
+            var st = d.stats || {};
+            toast('恢复完成：' + (st.notes || 0) + ' 篇笔记 / ' + (st.categories || 0) + ' 个分类');
+            status('恢复完成');
+            return bootstrap();
+          })
+          .catch(function (e) { status(''); toast(e.message); });
+        return true;
+      });
+  }
+
   // ---------- 笔记操作 ----------
   function newNote() {
     var cat = state.currentCategory || (state.categories[0] && state.categories[0].name) || '默认';
@@ -661,6 +726,14 @@
     $('btn-gen-token').onclick = genToken;
     $('btn-change-password').onclick = changePassword;
     $('btn-save-settings').onclick = saveSettings;
+
+    $('btn-backup').onclick = exportBackup;
+    $('btn-restore').onclick = function () { $('file-backup').click(); };
+    $('file-backup').onchange = function (e) {
+      var f = e.target.files && e.target.files[0];
+      if (f) restoreBackup(f);
+      e.target.value = '';
+    };
 
     // Markdown 样式选择：点击即生效并保存
     $('theme-picker').onclick = function (e) {

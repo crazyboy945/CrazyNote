@@ -1,5 +1,5 @@
 appname=crazynote
-version=1.0.6
+version=1.0.7
 display_name=CrazyNote
 desc=CrazyNote 笔记应用：笔记以 .md 文件存储在 NAS 硬盘上，每个分类对应一个子目录，支持网页摘录。
 platform=x86
@@ -17,4 +17,4 @@ desktop_uidir=ui
 desktop_applaunchname=crazynote.main
 disable_authorization_path=false
 install_type=root
-changelog=修复飞牛网关下前端资源与图片地址丢失前缀导致图片无法显示；笔记内图片路径改为稳定地址，渲染时按需补网关前缀。
+changelog=新增笔记备份与恢复功能：设置里一键导出全量备份 ZIP（分类/笔记/图片/设置），恢复前自动快照并校验压缩包安全。
