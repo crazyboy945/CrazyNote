@@ -440,7 +440,7 @@
     $('btn-preview').textContent = reading ? '✏️ 编辑' : '👁 预览';
     if (reading) {
       renderPreview();
-      status('阅读模式 · 点击内容进入编辑');
+      status('阅读模式 · 双击内容进入编辑');
     } else {
       $('note-body').focus();
       status('编辑模式 · Ctrl+S 保存');
@@ -713,8 +713,8 @@
 
     $('btn-preview').onclick = function () { setMode(!state.previewMode); };
 
-    // 阅读模式下点击正文切换到编辑（链接除外，避免打断跳转）
-    $('preview').onclick = function (e) {
+    // 阅读模式下双击正文切换到编辑（链接除外，避免打断跳转）
+    $('preview').ondblclick = function (e) {
       if (e.target.closest('a')) return;
       setMode(false);
     };
@@ -792,8 +792,14 @@
         saveNote();
       }
       if (e.key === 'Escape') {
-        $('settings-overlay').hidden = true;
-        $('prompt-overlay').hidden = true;
+        // 弹窗优先关闭
+        if (!$('settings-overlay').hidden || !$('prompt-overlay').hidden) {
+          $('settings-overlay').hidden = true;
+          $('prompt-overlay').hidden = true;
+          return;
+        }
+        // 编辑模式按 ESC 回到预览模式
+        if (!state.previewMode) setMode(true);
       }
     };
 
