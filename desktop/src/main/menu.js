@@ -30,6 +30,7 @@ function build(handlers) {
       submenu: [
         { label: '新建笔记', accelerator: 'CmdOrCtrl+N', click: () => handlers.onNewNote() },
         { label: '摘录剪贴板', accelerator: 'CmdOrCtrl+Shift+V', click: () => handlers.onClip() },
+        { label: '网页摘录', accelerator: 'CmdOrCtrl+Shift+U', click: () => handlers.onWebClip() },
         { type: 'separator' },
         ...(isMac ? [] : [{ label: '设置', accelerator: 'CmdOrCtrl+,', click: () => handlers.onSettings() }]),
         { type: 'separator' },

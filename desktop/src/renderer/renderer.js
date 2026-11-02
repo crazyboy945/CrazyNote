@@ -477,6 +477,7 @@ function bindEvents() {
   // 主界面
   $('btn-new').addEventListener('click', createNote);
   $('btn-clip').addEventListener('click', doClip);
+  $('btn-webclip').addEventListener('click', openWebClip);
   $('btn-settings').addEventListener('click', openSettings);
   $('btn-sidebar').addEventListener('click', () => $('sidebar').classList.toggle('collapsed'));
   $('btn-disconnect').addEventListener('click', disconnect);
@@ -511,6 +512,12 @@ function bindEvents() {
 
   // 设置
   $('btn-settings-close').addEventListener('click', () => { $('settings-overlay').hidden = true; });
+
+  // 网页摘录弹窗
+  $('btn-webclip-cancel').addEventListener('click', closeWebClip);
+  $('btn-webclip-save').addEventListener('click', doWebClip);
+  $('webclip-url').addEventListener('keydown', (e) => { if (e.key === 'Enter') doWebClip(); });
+  $('webclip-overlay').addEventListener('click', (e) => { if (e.target === $('webclip-overlay')) closeWebClip(); });
   $('btn-settings-save').addEventListener('click', async () => {
     const url = $('set-url').value.trim();
     const pwd = $('set-password').value;
@@ -532,6 +539,7 @@ function bindEvents() {
     if (mod && e.key.toLowerCase() === 's') { e.preventDefault(); saveNote(); }
     else if (mod && e.key.toLowerCase() === 'n') { e.preventDefault(); createNote(); }
     else if (mod && e.shiftKey && e.key.toLowerCase() === 'v') { e.preventDefault(); doClip(); }
+    else if (mod && e.shiftKey && e.key.toLowerCase() === 'u') { e.preventDefault(); openWebClip(); }
     else if (mod && e.key.toLowerCase() === 'f') { e.preventDefault(); $('search').focus(); $('search').select(); }
     else if (mod && e.key === ',') { e.preventDefault(); openSettings(); }
   });
@@ -539,6 +547,7 @@ function bindEvents() {
   // 菜单事件
   api.onMenu('menu:new-note', createNote);
   api.onMenu('menu:clip', doClip);
+  api.onMenu('menu:webclip', openWebClip);
   api.onMenu('menu:search', () => { $('search').focus(); $('search').select(); });
   api.onMenu('menu:settings', openSettings);
 
@@ -553,6 +562,74 @@ async function doClip() {
   const res = await api.clipClipboard(cat);
   if (!res.ok) { toast(res.error || '摘录失败', true); return; }
   toast('已存入「' + (res.data && res.data.category) + '」');
+  await loadCategories();
+  await loadNotes();
+}
+
+// ---------- 网页摘录（粘贴链接抓取正文） ----------
+
+async function fillWebClipCategories() {
+  const sel = $('webclip-category');
+  sel.innerHTML = '<option value="">加载中…</option>';
+  const res = await api.request('GET', '/api/categories');
+  if (!res.ok) {
+    sel.innerHTML = '<option value="摘录">摘录</option>';
+    return;
+  }
+  const cats = (res.data && res.data.categories) || [];
+  sel.innerHTML = '';
+  cats.forEach((c) => {
+    const o = document.createElement('option');
+    o.value = c.name;
+    o.textContent = c.name + ' (' + (c.count || 0) + ')';
+    sel.appendChild(o);
+  });
+  if (!cats.find((c) => c.name === '摘录')) {
+    const o = document.createElement('option');
+    o.value = '摘录';
+    o.textContent = '摘录 (新建)';
+    sel.appendChild(o);
+  }
+  if (state.config && state.config.lastCategory) sel.value = state.config.lastCategory;
+}
+
+function openWebClip() {
+  $('webclip-overlay').hidden = false;
+  $('webclip-status').className = 'status';
+  $('webclip-status').textContent = '';
+  $('webclip-title').value = '';
+  $('webclip-url').value = '';
+  fillWebClipCategories();
+  setTimeout(() => $('webclip-url').focus(), 50);
+}
+
+function closeWebClip() {
+  $('webclip-overlay').hidden = true;
+}
+
+async function doWebClip() {
+  const url = $('webclip-url').value.trim();
+  const category = $('webclip-category').value || '摘录';
+  const title = $('webclip-title').value.trim();
+  const status = $('webclip-status');
+  if (!/^https?:\/\//i.test(url)) {
+    status.className = 'status err show';
+    status.textContent = '请输入有效的网页链接（http/https）';
+    return;
+  }
+  status.className = 'status info show';
+  status.textContent = '正在抓取网页正文…';
+  const res = await api.clipUrl(url, category, title);
+  if (!res.ok) {
+    status.className = 'status err show';
+    status.textContent = '摘录失败：' + (res.error || '未知错误');
+    return;
+  }
+  status.className = 'status ok show';
+  status.textContent = '✅ 已保存「' + (res.data && res.data.category) + '」/ ' + (res.data && res.data.title);
+  if (state.config) state.config.lastCategory = category;
+  await api.setConfig({ lastCategory: category }).catch(() => {});
+  setTimeout(closeWebClip, 1300);
   await loadCategories();
   await loadNotes();
 }

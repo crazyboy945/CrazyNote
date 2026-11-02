@@ -98,7 +98,7 @@ source: https://blog.example.com/go-concurrency
 
 ```bash
 bash scripts/build.sh          # 交叉编译 x86_64 / arm64 / armv7l
-python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.10.fpk
+python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.11.fpk
 ```
 
 > **版本号（重要）**：fnOS 应用中心按 manifest 里的 `version` 判断能否覆盖安装，
@@ -120,7 +120,7 @@ python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.10.fpk
 
 **安装**：
 
-1. 把 `dist/crazynote-1.0.10.fpk` 传到 NAS（可走文件管理或 SMB）
+1. 把 `dist/crazynote-1.0.11.fpk` 传到 NAS（可走文件管理或 SMB）
 2. 飞牛桌面 → 应用中心 → 手动安装 → 选择该 fpk
 3. 向导里填写**笔记存储目录**（例如 `/vol1/1000/Notes`）和局域网端口
 4. 装完后飞牛桌面出现「CrazyNote」图标，点击即用（走统一网关，NAS 账号免登）
@@ -130,7 +130,7 @@ python scripts/build_fpk.py    # 生成 dist/crazynote-1.0.10.fpk
 也可以用命令行安装：
 
 ```bash
-appcenter-cli install-fpk crazynote-1.0.10.fpk
+appcenter-cli install-fpk crazynote-1.0.11.fpk
 ```
 
 ### 方式 B：裸二进制（SSH 直接跑）
@@ -285,8 +285,8 @@ Electron 桌面程序，连接 NAS 上的 CrazyNote 服务端浏览与编辑笔�
 
 | 平台 | 产物 | 安装方式 |
 |------|------|----------|
-| Windows | `CrazyNote-1.0.1-x64.exe`（安装包）、`CrazyNote-1.0.1-x64.zip`（免安装） | 双击安装，或解压后直接运行 |
-| Linux | `CrazyNote-1.0.1-linux-x64.AppImage`（单文件）、`CrazyNote-1.0.1-linux-x64.deb`（Debian/Ubuntu）、`CrazyNote-1.0.1-linux-x64.tar.gz`（免安装） | AppImage 加执行权限直接运行；deb 用 `sudo apt install ./xxx.deb` |
+| Windows | `CrazyNote-1.0.11-x64.exe`（安装包）、`CrazyNote-1.0.11-x64.zip`（免安装） | 双击安装，或解压后直接运行 |
+| Linux | `CrazyNote-1.0.11-linux-x64.AppImage`（单文件）、`CrazyNote-1.0.11-linux-amd64.deb`（Debian/Ubuntu）、`CrazyNote-1.0.11-linux-x64.tar.gz`（免安装） | AppImage 加执行权限直接运行；deb 用 `sudo apt install ./xxx.deb` |
 
 启动后填服务端地址与访问口令 → 连接。
 
@@ -294,9 +294,10 @@ Electron 桌面程序，连接 NAS 上的 CrazyNote 服务端浏览与编辑笔�
 |------|------|
 | 三栏界面 | 左侧分类与标签、中间笔记列表、右侧编辑与预览 |
 | 全文搜索 | `Ctrl+F` 聚焦搜索框 |
-| 快捷键 | `Ctrl+N` 新建、`Ctrl+S` 保存、`Ctrl+Shift+V` 摘录剪贴板、`Ctrl+,` 设置 |
-| 系统托盘 | 常驻后台，右键菜单可新建笔记、摘录剪贴板、退出 |
+| 快捷键 | `Ctrl+N` 新建、`Ctrl+S` 保存、`Ctrl+Shift+V` 摘录剪贴板、`Ctrl+Shift+U` 网页摘录、`Ctrl+,` 设置 |
+| 系统托盘 | 常驻后台，右键菜单可新建笔记、摘录剪贴板、网页摘录、退出 |
 | 剪贴板速记 | `Ctrl+Shift+V` 把剪贴板内容直接存进「摘录」分类 |
+| 网页摘录 | 点工具栏地球图标（或 `Ctrl+Shift+U` / 菜单 / 托盘）弹出输入框，粘贴网页链接即自动抓取正文并存为 Markdown 笔记；正文提取在服务端完成，自动过滤导航/页脚等噪声 |
 | 凭据安全 | 口令用系统 `safeStorage` 加密存储；Linux 无系统钥匙环时自动降级为本地编码 |
 | 亮暗适配 | 跟随系统主题，代码高亮同步切换 |
 

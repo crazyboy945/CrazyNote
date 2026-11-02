@@ -40,6 +40,7 @@ class AppTray {
       { type: 'separator' },
       { label: '新建笔记', click: () => this.handlers.onNewNote() },
       { label: '摘录剪贴板', click: () => this.handlers.onClip() },
+      { label: '网页摘录', click: () => this.handlers.onWebClip() },
       { type: 'separator' },
       { label: '退出', click: () => this.handlers.onQuit() },
     ]);

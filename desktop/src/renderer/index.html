@@ -65,6 +65,9 @@
       <button class="icon-btn" id="btn-clip" title="摘录剪贴板 (Ctrl+Shift+V)">
         <svg viewBox="0 0 16 16" width="16" height="16"><path d="M6 2h4v2H6z M4 4h8v10H4z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
       </button>
+      <button class="icon-btn" id="btn-webclip" title="网页摘录：粘贴链接抓取正文 (Ctrl+Shift+U)">
+        <svg viewBox="0 0 16 16" width="16" height="16"><circle cx="7.5" cy="7.5" r="4.5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M7.5 5.2v4.6M5.2 7.5h4.6" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+      </button>
       <button class="icon-btn primary" id="btn-new" title="新建笔记 (Ctrl+N)">
         <svg viewBox="0 0 16 16" width="16" height="16"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       </button>
@@ -175,6 +178,31 @@
       <button class="ghost-btn" id="btn-prompt-cancel">取消</button>
       <button class="primary-btn" id="btn-prompt-ok">确定</button>
     </div>
+  </div>
+</div>
+
+<!-- ============ 网页摘录弹窗 ============ -->
+<div class="overlay" id="webclip-overlay" hidden>
+  <div class="dialog">
+    <h2>网页摘录</h2>
+    <p class="dialog-hint">粘贴网页链接，自动抓取正文并保存为笔记（正文提取在服务端完成）。</p>
+    <label class="field">
+      <span>网页链接</span>
+      <input type="text" id="webclip-url" placeholder="https://example.com/article" spellcheck="false" autocomplete="url">
+    </label>
+    <label class="field">
+      <span>保存到分类</span>
+      <select id="webclip-category"></select>
+    </label>
+    <label class="field">
+      <span>标题（留空自动取网页标题）</span>
+      <input type="text" id="webclip-title" placeholder="自动读取网页标题" spellcheck="false">
+    </label>
+    <div class="dialog-actions">
+      <button class="ghost-btn" id="btn-webclip-cancel">取消</button>
+      <button class="primary-btn" id="btn-webclip-save">抓取并保存</button>
+    </div>
+    <div class="status" id="webclip-status"></div>
   </div>
 </div>
 

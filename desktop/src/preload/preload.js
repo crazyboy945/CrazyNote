@@ -27,6 +27,9 @@ contextBridge.exposeInMainWorld('crazynote', {
   // 剪贴板摘录
   clipClipboard: (category, title) => ipcRenderer.invoke('clip:clipboard', { category, title }),
 
+  // 网页摘录：传入网页链接，由主进程抓取 HTML 后交由服务端提取
+  clipUrl: (url, category, title) => ipcRenderer.invoke('clip:url', { url, category, title }),
+
   // 外部链接
   openExternal: (url) => ipcRenderer.invoke('shell:open', url),
   showItem: (p) => ipcRenderer.invoke('shell:showItem', p),
@@ -39,7 +42,7 @@ contextBridge.exposeInMainWorld('crazynote', {
 
   // 菜单事件
   onMenu: (channel, handler) => {
-    const allowed = ['menu:new-note', 'menu:clip', 'menu:search', 'menu:settings'];
+    const allowed = ['menu:new-note', 'menu:clip', 'menu:webclip', 'menu:search', 'menu:settings'];
     if (!allowed.includes(channel)) return () => {};
     const listener = () => handler();
     ipcRenderer.on(channel, listener);

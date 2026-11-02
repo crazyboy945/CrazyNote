@@ -150,6 +150,47 @@ function registerIpc() {
     });
   });
 
+  // 网页摘录：主进程直接抓取网页 HTML（绕过浏览器 CORS），再交给服务端提取正文。
+  ipcMain.handle('clip:url', async (_e, { url, category, title }) => {
+    const sess = store.getSession();
+    if (!sess) return { ok: false, error: '未连接服务器' };
+    if (!/^https?:\/\//i.test(url || '')) return { ok: false, error: '链接格式不正确' };
+
+    let html = '';
+    let fetchErr = '';
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 25000);
+      const resp = await fetch(url, {
+        redirect: 'follow',
+        signal: controller.signal,
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        },
+      });
+      clearTimeout(timer);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      // 仅接受文本类响应，避免把图片/压缩包当正文
+      const ct = (resp.headers.get('content-type') || '').toLowerCase();
+      if (ct && !/html|xml|text\//.test(ct)) throw new Error('该链接不是网页（' + ct + '）');
+      html = await resp.text();
+    } catch (e) {
+      fetchErr = e.name === 'AbortError' ? '抓取超时' : e.message || '抓取失败';
+    }
+    if (!html || !html.trim()) return { ok: false, error: fetchErr || '抓取到的内容为空' };
+
+    return api.request(sess.url, 'POST', '/api/clip', {
+      body: {
+        category: category || '摘录',
+        title: title || '',
+        url: url,
+        html: html,
+      },
+    });
+  });
+
   // 打开外部链接
   ipcMain.handle('shell:open', (_e, url) => {
     if (/^https?:\/\//i.test(url)) shell.openExternal(url);
@@ -226,6 +267,7 @@ if (!singleInstance) {
     Menu.build({
       onNewNote: () => mainWindow && mainWindow.webContents.send('menu:new-note'),
       onClip: () => mainWindow && mainWindow.webContents.send('menu:clip'),
+      onWebClip: () => mainWindow && mainWindow.webContents.send('menu:webclip'),
       onSearch: () => mainWindow && mainWindow.webContents.send('menu:search'),
       onSettings: () => mainWindow && mainWindow.webContents.send('menu:settings'),
       onToggleDevTools: () => mainWindow && mainWindow.webContents.toggleDevTools(),
@@ -246,6 +288,7 @@ if (!singleInstance) {
       },
       onNewNote: () => mainWindow && mainWindow.webContents.send('menu:new-note'),
       onClip: () => mainWindow && mainWindow.webContents.send('menu:clip'),
+      onWebClip: () => mainWindow && mainWindow.webContents.send('menu:webclip'),
       onQuit: () => {
         app.isQuitting = true;
         app.quit();

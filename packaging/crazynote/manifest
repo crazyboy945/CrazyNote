@@ -1,5 +1,5 @@
 appname=crazynote
-version=1.0.10
+version=1.0.11
 display_name=CrazyNote
 desc=CrazyNote 笔记应用：笔记以 .md 文件存储在 NAS 硬盘上，每个分类对应一个子目录，支持网页摘录。
 platform=x86
@@ -17,4 +17,4 @@ desktop_uidir=ui
 desktop_applaunchname=crazynote.main
 disable_authorization_path=false
 install_type=root
-changelog=阅读模式由单击进入编辑改为双击进入编辑（避免误触）；编辑模式按 ESC 回到预览模式；版本号 1.0.10。
+changelog=桌面端新增「网页摘录」：粘贴网页链接即自动抓取正文并保存为 Markdown 笔记（正文提取在服务端完成）；版本号 1.0.11。

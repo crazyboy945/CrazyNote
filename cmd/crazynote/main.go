@@ -11,7 +11,7 @@ import (
 	"github.com/local/crazynote/internal/server"
 )
 
-var version = "1.0.10"
+var version = "1.0.11"
 
 func main() {
 	var (

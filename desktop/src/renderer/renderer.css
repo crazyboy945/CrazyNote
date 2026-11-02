@@ -349,6 +349,7 @@ button { cursor: pointer; border: 1px solid transparent; border-radius: var(--ra
   border-radius: 12px; box-shadow: 0 16px 48px rgba(0,0,0,.24);
 }
 .dialog h2 { margin: 0 0 18px; font-size: 15px; font-weight: 650; }
+.dialog-hint { margin: -8px 0 16px; font-size: 11.5px; color: var(--text-faint); line-height: 1.6; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
 
 /* ---------------- Toast ---------------- */
